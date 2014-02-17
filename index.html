@@ -4,6 +4,8 @@
 	<meta charset="UTF-8" />
 	<title>Editor</title>
 	<script type="text/javascript" src="js/phaser.min.js"></script>	
+	<script type="text/javascript" src="js/editor.js"></script>
+        <script type="text/javascript" src="js/soundcheck.js"></script>
     <style type="text/css">
         body {
             margin: 0;
@@ -11,7 +13,11 @@
     </style>
 </head>
 <body>
-<button id="XMLgen">Click Me!</button>
-<script type="text/javascript" src="js/editor.js"></script>
+<button id="XMLgen" onclick="generateXML();">Generate XML</button>
+<button id="switch" onclick="getXML();">Pitch test</button>
+<canvas id="graph" width="800" height="500"></canvas>
+
+
+
 </body>
 </html>

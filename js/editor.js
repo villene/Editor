@@ -1,13 +1,14 @@
 var game = new Phaser.Game(800, 500, Phaser.AUTO, '', { preload: preload, create: create});
+var gridHeight = 25;
+var gridWidth = 40;
+var note=[];
+var xmlNotes=[];
+window.xmlDoc;
 
 function preload() {
         game.load.spritesheet('stance', 'assets/download.png', 20, 20, 2);
 }
-var gridHeight = 25;
-var gridWidth = 40;
 
-var note=[];
-var xmlNotes=[];
 function create() {
 	for (var j = 0; j<gridHeight; j++){
             note[j]=[];
@@ -50,7 +51,8 @@ function fillNote()
     
     xmlNotes[x]={step:step, octave:oct};
     
-    if (this.on)xmlNotes[x]=null;
+    if (this.on) xmlNotes.splice(x,1);
+    //{xmlNotes[x].step=null; xmlNotes[x].octave=null;}
     this.on = !this.on;
     this.setFrames(1, (this.on)?1:0, 1);
     this.frame = (this.on)?1:0;
@@ -58,20 +60,20 @@ function fillNote()
     
 }
 
-document.getElementById("XMLgen").onclick = generateXML;
+//document.getElementById("XMLgen").onclick = generateXML;
 
 function generateXML()
-
 {
-var xmldoc = document.implementation.createDocument(null, "score-partwise", null);
-//alert(xmldoc2);
+    xmlDoc = document.implementation.createDocument(null, "score-partwise", null);
+    //alert(xmldoc2);
 
-for (var i=0; i<xmlNotes.length; i++){
-    
-    var xmlStep = xmldoc.documentElement.appendChild(xmldoc.createElement("step"));
-    xmlStep.textContent = xmlNotes[i].step;
-    var xmlOctave = xmldoc.documentElement.appendChild(xmldoc.createElement("octave"));
-    xmlOctave.textContent = xmlNotes[i].octave;
-}
-alert((new XMLSerializer()).serializeToString(xmldoc));
+    for (var i=0; i<xmlNotes.length; i++){
+
+        var xmlStep = xmlDoc.documentElement.appendChild(xmlDoc.createElement("step"));
+        xmlStep.textContent = xmlNotes[i].step;
+        var xmlOctave = xmlDoc.documentElement.appendChild(xmlDoc.createElement("octave"));
+        xmlOctave.textContent = xmlNotes[i].octave;
+    }
+    //alert((new XMLSerializer()).serializeToString(xmlDoc));
+
 };
