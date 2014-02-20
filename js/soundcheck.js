@@ -29,11 +29,15 @@ function getXML(){
     //xmlDoc=xmlhttp.responseXML;
     var steplist = xmlDoc.getElementsByTagName("step"); 
     var octlist = xmlDoc.getElementsByTagName("octave");
+    var altlist = xmlDoc.getElementsByTagName("alter");
+    var textlist = xmlDoc.getElementsByTagName("text");
     
     for(var i=0; i<steplist.length; i++)
         {
             NoteObject[i]={step:steplist[i].childNodes[0].nodeValue, 
                            octave:octlist[i].childNodes[0].nodeValue,
+                           alter:altlist[i].childNodes[0].nodeValue,
+                           lyric:textlist[i].childNodes[0].nodeValue,
                            correct:null};
         }
         updateAnalysers();
@@ -137,7 +141,7 @@ function drawData(freqData){
     else if (NoteObject[i].correct===false) analyserContext.strokeStyle='red';
     
     analyserContext.arc(canvasWidth-noteLocation+60*i,canvasHeight-(NoteDraw*10)-10,10,0,2*Math.PI);    
-    analyserContext.fillText(freq, canvasWidth-noteLocation-14+60*i, canvasHeight-(NoteDraw*10)+18);   
+    analyserContext.fillText(NoteObject[i].lyric, canvasWidth-noteLocation-14+60*i, canvasHeight-(NoteDraw*10)+18);   
     analyserContext.fillText(fullnote.step+fullnote.oct, canvasWidth-noteLocation-14+60*i, canvasHeight-(NoteDraw*10)+30);
     analyserContext.stroke();
         }

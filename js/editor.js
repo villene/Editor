@@ -1,5 +1,5 @@
 var game = new Phaser.Game(800, 500, Phaser.CANVAS, '', { preload: preload, create: create, update: update, render:render});
-var gridHeight = 60;
+var gridHeight = 35;
 var gridWidth = 100;
 var note=[];
 var xmlNotes=[];
@@ -9,14 +9,17 @@ var locationY=0;
 var cameraX=0;
 var cameraY=0;
 var label;
+var lastNote;
+//var alteration = document.getElementById('alteration');
+//var lyrics = document.getElementById('lyrics');
 
 function preload() {
         game.load.spritesheet('stance', 'assets/download.png', 20, 20, 2);
-        game.load.image('labels', 'assets/labels.png');
+        game.load.image('labels', 'assets/labels_min.png');
 }
 
 function create() {
-        game.world.setBounds(0, 0, 2060, 1200); 
+        game.world.setBounds(0, 0, gridWidth*20+60, gridHeight*20); 
         //game.camera.setPosition(0, 701);
         //create layers for buttons and note labels
         var noteLayer = game.add.group();
@@ -42,6 +45,14 @@ function create() {
 function fillNote()
 {
     if (game.input.x>60){
+        //upon clicking another note, fills the optional values of the previous note
+    if(lastNote!==undefined)
+        {
+            xmlNotes[lastNote].alteration=document.getElementById('alteration').value;
+            xmlNotes[lastNote].lyrics=document.getElementById('lyrics').value;
+            alteration.value="0";
+            lyrics.value="";
+        }
     var y=this.hgt;
     var x=this.wdt;
     
@@ -55,33 +66,28 @@ function fillNote()
                 break;}
         }
     
-    var oct = Math.floor((gridHeight-y)/12)+2;
-    var step = (gridHeight-y)%12;
+    var oct = Math.floor((gridHeight-y)/7)+2;
+    var step = (gridHeight-y)%7;
     
     switch(step){
-        case 1: {step='C';break;}
-        case 2: {step='C♯/D♭';break;}
-        case 3: {step='D';break;}
-        case 4: {step='D♯/E♭';break;}
-        case 5: {step='E';break;}
-        case 6: {step='F';break;}
-        case 7: {step='F♯/G♭';break;}
-        case 8: {step='G';break;}
-        case 9: {step='G♯/A♭';break;}
-        case 10: {step='A';break;}
-        case 11: {step='A♯/B♭';break;}
+        case 1: {step='C';break;}        
+        case 2: {step='D';break;}        
+        case 3: {step='E';break;}
+        case 4: {step='F';break;}        
+        case 5: {step='G';break;}        
+        case 6: {step='A';break;}        
         case 0: {step='B'; oct--;break;}
     }
     
     xmlNotes[x]={step:step, octave:oct};
-    
+    lastNote=x;
     if (this.on) xmlNotes.splice(x,1);
     this.on = !this.on;
     this.setFrames(1, (this.on)?1:0, 1);
     this.frame = (this.on)?1:0;
     }
     else return;
-    alert(xmlNotes[x].step+xmlNotes[x].octave);
+    //alert(xmlNotes[x].step+xmlNotes[x].octave);
     
 }
 
@@ -89,6 +95,13 @@ function fillNote()
 
 function generateXML()
 {
+    
+            xmlNotes[lastNote].alteration=document.getElementById('alteration').value;
+            xmlNotes[lastNote].lyrics=document.getElementById('lyrics').value;
+            alteration.value="0";
+            lyrics.value="";
+       
+        
     xmlDoc = document.implementation.createDocument(null, "score-partwise", null);
     //alert(xmldoc2);
 
@@ -98,8 +111,16 @@ function generateXML()
         xmlStep.textContent = xmlNotes[i].step;
         var xmlOctave = xmlDoc.documentElement.appendChild(xmlDoc.createElement("octave"));
         xmlOctave.textContent = xmlNotes[i].octave;
+        
+        var xmlAlt = xmlDoc.documentElement.appendChild(xmlDoc.createElement("alter"));
+        xmlAlt.textContent = xmlNotes[i].alteration;        
+        
+        var xmlLyrics = xmlDoc.documentElement.appendChild(xmlDoc.createElement("text"));
+        if (xmlNotes[i].lyrics==="") xmlLyrics.textContent=" ";
+        else xmlLyrics.textContent = xmlNotes[i].lyrics;
+        
     }
-    //alert((new XMLSerializer()).serializeToString(xmlDoc));
+    alert((new XMLSerializer()).serializeToString(xmlDoc));
 
 };
 

@@ -13,9 +13,15 @@
     </style>
 </head>
 <body>
-<button id="XMLgen" onclick="generateXML();">Generate XML</button>
-<button id="switch" onclick="getXML();">Pitch test</button>
-<canvas id="graph" width="800" height="500"></canvas>
+    <button id="XMLgen" onclick="generateXML();">Generate XML</button>
+    <button id="switch" onclick="getXML();">Pitch test</button>
+    <select id="alteration">
+                <option value="0">Alteration</option>
+                <option value="-1">♭</option>
+                <option value="+1">♯</option>
+    </select>
+    <input type="text" id="lyrics" placeholder="Type lyrics here"/>
+    <canvas id="graph" width="800" height="500"></canvas>
 
 
 
