@@ -1,62 +1,87 @@
-var game = new Phaser.Game(800, 500, Phaser.AUTO, '', { preload: preload, create: create});
-var gridHeight = 25;
-var gridWidth = 40;
+var game = new Phaser.Game(800, 500, Phaser.CANVAS, '', { preload: preload, create: create, update: update, render:render});
+var gridHeight = 60;
+var gridWidth = 100;
 var note=[];
 var xmlNotes=[];
 window.xmlDoc;
+var locationX=0;
+var locationY=0;
+var cameraX=0;
+var cameraY=0;
+var label;
 
 function preload() {
         game.load.spritesheet('stance', 'assets/download.png', 20, 20, 2);
+        game.load.image('labels', 'assets/labels.png');
 }
 
 function create() {
+        game.world.setBounds(0, 0, 2060, 1200); 
+        //game.camera.setPosition(0, 701);
+        //create layers for buttons and note labels
+        var noteLayer = game.add.group();
+        noteLayer.z=0;
+        var labelLayer = game.add.group();
+        labelLayer.z=1;
+        label = game.add.sprite(0,0, 'labels');
+        //label.fixedToCamera=true;
+        labelLayer.add(label);
 	for (var j = 0; j<gridHeight; j++){
             note[j]=[];
         for (var i = 0; i < gridWidth; i++)
     {
-        note[j][i] = game.add.button(i*20, j*20, 'stance', fillNote, note[j][i], 1,0,1);
+        note[j][i] = game.add.button(60+i*20, j*20, 'stance', fillNote, note[j][i], 1,0,1);
         note[j][i].hgt=j;
         note[j][i].wdt=i;
         note[j][i].on=false;
+        noteLayer.add(note[j][i]);
     }
 	}
 }
+
 function fillNote()
 {
+    if (game.input.x>60){
     var y=this.hgt;
     var x=this.wdt;
     
     for (var i = 0; i<gridHeight; i++)
         {
             if(i===y)continue;
-            if (note[i][x].on){note[i][x].on=false;
-            note[i][x].setFrames(1, (note[i][x].on)?1:0, 1);
-            note[i][x].frame = (note[i][x].on)?1:0;
-            break;}
+            if (note[i][x].on){
+                note[i][x].on=false;
+                note[i][x].setFrames(1, (note[i][x].on)?1:0, 1);
+                note[i][x].frame = (note[i][x].on)?1:0;
+                break;}
         }
     
-    var oct = Math.floor((25-y)/7);
-    var step = (25-y)%7;
+    var oct = Math.floor((gridHeight-y)/12)+2;
+    var step = (gridHeight-y)%12;
     
-    switch(step)
-    {
-        case 1: step='C'; break;
-        case 2: step='D'; break;
-        case 3: step='E'; break;
-        case 4: step='F'; break;
-        case 5: step='G'; break;
-        case 6: step='A'; break;
-        case 7: step='B'; oct--; break;
+    switch(step){
+        case 1: {step='C';break;}
+        case 2: {step='C♯/D♭';break;}
+        case 3: {step='D';break;}
+        case 4: {step='D♯/E♭';break;}
+        case 5: {step='E';break;}
+        case 6: {step='F';break;}
+        case 7: {step='F♯/G♭';break;}
+        case 8: {step='G';break;}
+        case 9: {step='G♯/A♭';break;}
+        case 10: {step='A';break;}
+        case 11: {step='A♯/B♭';break;}
+        case 0: {step='B'; oct--;break;}
     }
     
     xmlNotes[x]={step:step, octave:oct};
     
     if (this.on) xmlNotes.splice(x,1);
-    //{xmlNotes[x].step=null; xmlNotes[x].octave=null;}
     this.on = !this.on;
     this.setFrames(1, (this.on)?1:0, 1);
     this.frame = (this.on)?1:0;
-    //alert(xmlNotes[x].step+xmlNotes[x].octave);
+    }
+    else return;
+    alert(xmlNotes[x].step+xmlNotes[x].octave);
     
 }
 
@@ -77,3 +102,34 @@ function generateXML()
     //alert((new XMLSerializer()).serializeToString(xmlDoc));
 
 };
+
+function update() {
+    //game.input.disabled(game.input.x<60)?true:false;
+    //else game.input.disabled=false;
+    //camera drag
+    if (game.input.mousePointer.isDown)
+        {
+            game.input.onDown.add(cameraDrag, this);     
+            game.camera.setPosition(cameraX+locationX-game.input.x, cameraY+locationY-game.input.y);
+            
+        label.x=game.camera.x;
+            //label.y=-cameraY-locationY+game.input.y;    
+            //game.camera.x=cameraX+locationX-game.input.x;
+            //game.camera.y=cameraY+locationY-game.input.y;                        
+        }    
+}
+//get the pointer and camera coordinates in the moment of mouse click
+function cameraDrag()
+{
+    locationX=game.input.x;
+    locationY=game.input.y;
+    cameraX=game.camera.x;
+    cameraY=game.camera.y;
+    
+}
+
+function render() {
+
+    //game.debug.renderCameraInfo(game.camera, 32, 32);
+
+}
