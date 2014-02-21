@@ -120,7 +120,7 @@ function generateXML()
         else xmlLyrics.textContent = xmlNotes[i].lyrics;
         
     }
-    alert((new XMLSerializer()).serializeToString(xmlDoc));
+    //alert((new XMLSerializer()).serializeToString(xmlDoc));
 
 };
 

@@ -115,17 +115,17 @@ function drawData(freqData){
         {                       
     switch (NoteObject[i].step)
     {
-        case 'C': NoteDraw=7*NoteObject[i].octave+1; break;
-        case 'D': NoteDraw=7*NoteObject[i].octave+2; break;
-        case 'E': NoteDraw=7*NoteObject[i].octave+3; break;
-        case 'F': NoteDraw=7*NoteObject[i].octave+4; break;
-        case 'G': NoteDraw=7*NoteObject[i].octave+5; break;
-        case 'A': NoteDraw=7*NoteObject[i].octave+6; break;
-        case 'B': NoteDraw=7*NoteObject[i].octave+7; break;
+        case 'C': NoteDraw=7*NoteObject[i].octave-1; break;
+        case 'D': NoteDraw=7*NoteObject[i].octave; break;
+        case 'E': NoteDraw=7*NoteObject[i].octave+1; break;
+        case 'F': NoteDraw=7*NoteObject[i].octave+2; break;
+        case 'G': NoteDraw=7*NoteObject[i].octave+3; break;
+        case 'A': NoteDraw=7*NoteObject[i].octave+4; break;
+        case 'B': NoteDraw=7*NoteObject[i].octave+5; break;
     }
     analyserContext.beginPath();
     analyserContext.strokeStyle='black';
-    var freq=noteToFrequency(NoteObject[i].octave, NoteObject[i].step);
+    var freq=noteToFrequency(NoteObject[i].octave, NoteObject[i].step, NoteObject[i].alter);
     var fullnote=frequencyToNote(freq);
     
     if (canvasWidth-noteLocation+60*i<canvasWidth/2+10 && canvasWidth-noteLocation+60*i>canvasWidth/2-10 && NoteObject[i].correct!==true)
@@ -141,8 +141,8 @@ function drawData(freqData){
     else if (NoteObject[i].correct===false) analyserContext.strokeStyle='red';
     
     analyserContext.arc(canvasWidth-noteLocation+60*i,canvasHeight-(NoteDraw*10)-10,10,0,2*Math.PI);    
-    analyserContext.fillText(NoteObject[i].lyric, canvasWidth-noteLocation-14+60*i, canvasHeight-(NoteDraw*10)+18);   
-    analyserContext.fillText(fullnote.step+fullnote.oct, canvasWidth-noteLocation-14+60*i, canvasHeight-(NoteDraw*10)+30);
+    analyserContext.fillText(freq, canvasWidth-noteLocation-14+60*i, canvasHeight-(NoteDraw*10)+18);   
+    analyserContext.fillText(fullnote.string, canvasWidth-noteLocation-14+60*i, canvasHeight-(NoteDraw*10)+30);
     analyserContext.stroke();
         }
          
@@ -215,7 +215,7 @@ function frequencyToNote(freq){
     return {step:step, oct:oct, note:note, string:step+oct};
 }
 
-function noteToFrequency(oct, step){
+function noteToFrequency(oct, step, alter){
     var freq;
     switch (step)
     {
@@ -227,7 +227,9 @@ function noteToFrequency(oct, step){
         case 'A': step=oct*12+10; break;
         case 'B': step=oct*12+12; break;
     }   
-    
+        if(alter==='1')step+=1;
+        else if(alter==='-1')step-=1;
+        
         if (step===58) freq=440;
         else{ step-=58; freq=440*Math.pow(1.059463, step);}        
    
