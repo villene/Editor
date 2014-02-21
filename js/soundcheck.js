@@ -7,7 +7,7 @@ var rafID = null;
 var analyserContext = null;
 var canvasWidth, canvasHeight;
 var Note = null;
-var NoteObject = new Array();
+var NoteObject = [];
 var noteLocation=0;
 var correctNotes=0;
 var heardPitchArray = [];
@@ -27,6 +27,7 @@ function getXML(){
     //xmlhttp.open("GET","sample.xml",false); //būtu kruta iespēja izvēlēties failu
     //xmlhttp.send();
     //xmlDoc=xmlhttp.responseXML;
+    NoteObject.splice(0,3);
     var steplist = xmlDoc.getElementsByTagName("step"); 
     var octlist = xmlDoc.getElementsByTagName("octave");
     var altlist = xmlDoc.getElementsByTagName("alter");
@@ -140,9 +141,10 @@ function drawData(freqData){
     if (NoteObject[i].correct===true) analyserContext.strokeStyle='green';
     else if (NoteObject[i].correct===false) analyserContext.strokeStyle='red';
     
-    analyserContext.arc(canvasWidth-noteLocation+60*i,canvasHeight-(NoteDraw*10)-10,10,0,2*Math.PI);    
-    analyserContext.fillText(freq, canvasWidth-noteLocation-14+60*i, canvasHeight-(NoteDraw*10)+18);   
-    analyserContext.fillText(fullnote.string, canvasWidth-noteLocation-14+60*i, canvasHeight-(NoteDraw*10)+30);
+    analyserContext.arc(canvasWidth-noteLocation+60*i,canvasHeight-(NoteDraw*10)-10,10,0,2*Math.PI);
+    analyserContext.fillText(NoteObject[i].lyric, canvasWidth-noteLocation-14+60*i, canvasHeight-(NoteDraw*10)+18); 
+    analyserContext.fillText(freq, canvasWidth-noteLocation-14+60*i, canvasHeight-(NoteDraw*10)+30);   
+    analyserContext.fillText(fullnote.string, canvasWidth-noteLocation-14+60*i, canvasHeight-(NoteDraw*10)+42);
     analyserContext.stroke();
         }
          

@@ -45,46 +45,56 @@ function create() {
 function fillNote()
 {
     if (game.input.x>60){
+        var y=this.hgt;
+        var x=this.wdt;
+        
+        if (this.on===true){
+            xmlNotes.splice(x,1);
+            this.on = false;
+            this.setFrames(1,0, 1);
+            this.frame = 0;
+            lastNote=undefined;
+        }
+        else{
         //upon clicking another note, fills the optional values of the previous note
-    if(lastNote!==undefined)
-        {
-            xmlNotes[lastNote].alteration=document.getElementById('alteration').value;
-            xmlNotes[lastNote].lyrics=document.getElementById('lyrics').value;
-            alteration.value="0";
-            lyrics.value="";
-        }
-    var y=this.hgt;
-    var x=this.wdt;
-    
-    for (var i = 0; i<gridHeight; i++)
-        {
-            if(i===y)continue;
-            if (note[i][x].on){
-                note[i][x].on=false;
-                note[i][x].setFrames(1, (note[i][x].on)?1:0, 1);
-                note[i][x].frame = (note[i][x].on)?1:0;
-                break;}
-        }
-    
-    var oct = Math.floor((gridHeight-y)/7)+2;
-    var step = (gridHeight-y)%7;
-    
-    switch(step){
-        case 1: {step='C';break;}        
-        case 2: {step='D';break;}        
-        case 3: {step='E';break;}
-        case 4: {step='F';break;}        
-        case 5: {step='G';break;}        
-        case 6: {step='A';break;}        
-        case 0: {step='B'; oct--;break;}
-    }
-    
-    xmlNotes[x]={step:step, octave:oct};
-    lastNote=x;
-    if (this.on) xmlNotes.splice(x,1);
-    this.on = !this.on;
-    this.setFrames(1, (this.on)?1:0, 1);
-    this.frame = (this.on)?1:0;
+            if(lastNote!==undefined)
+                {
+                    xmlNotes[lastNote].alteration=document.getElementById('alteration').value;
+                    xmlNotes[lastNote].lyrics=document.getElementById('lyrics').value;
+                    document.getElementById('alteration').value="0";
+                    document.getElementById('lyrics').value="";
+                }
+
+
+            for (var i = 0; i<gridHeight; i++)
+                {
+                    if(i===y)continue;
+                    if (note[i][x].on){
+                        note[i][x].on=false;
+                        note[i][x].setFrames(1, (note[i][x].on)?1:0, 1);
+                        note[i][x].frame = (note[i][x].on)?1:0;
+                        break;}
+                }
+
+            var oct = Math.floor((gridHeight-y)/7)+2;
+            var step = (gridHeight-y)%7;
+
+            switch(step){
+                case 1: {step='C';break;}        
+                case 2: {step='D';break;}        
+                case 3: {step='E';break;}
+                case 4: {step='F';break;}        
+                case 5: {step='G';break;}        
+                case 6: {step='A';break;}        
+                case 0: {step='B'; oct--;break;}
+            }
+
+            xmlNotes[x]={step:step, octave:oct};
+            lastNote=x;
+            //if (this.on) xmlNotes.splice(x,1);
+            this.on = true;
+            this.setFrames(1, 1, 1);
+            this.frame = 1;}
     }
     else return;
     //alert(xmlNotes[x].step+xmlNotes[x].octave);
@@ -95,16 +105,15 @@ function fillNote()
 
 function generateXML()
 {
-    
+    if(lastNote!==undefined){
             xmlNotes[lastNote].alteration=document.getElementById('alteration').value;
             xmlNotes[lastNote].lyrics=document.getElementById('lyrics').value;
-            alteration.value="0";
-            lyrics.value="";
+            document.getElementById('alteration').value="0";
+            document.getElementById('lyrics').value="";}
        
         
     xmlDoc = document.implementation.createDocument(null, "score-partwise", null);
-    //alert(xmldoc2);
-
+    
     for (var i=0; i<xmlNotes.length; i++){
 
         var xmlStep = xmlDoc.documentElement.appendChild(xmlDoc.createElement("step"));
@@ -120,7 +129,7 @@ function generateXML()
         else xmlLyrics.textContent = xmlNotes[i].lyrics;
         
     }
-    //alert((new XMLSerializer()).serializeToString(xmlDoc));
+    alert((new XMLSerializer()).serializeToString(xmlDoc));
 
 };
 
