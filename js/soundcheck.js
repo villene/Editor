@@ -6,8 +6,8 @@ var audioInput = null,
 var rafID = null;
 var analyserContext = null;
 var canvasWidth, canvasHeight;
-var Note = null;
 var NoteObject = [];
+var Note = null;
 var noteLocation=0;
 var correctNotes=0;
 var heardPitchArray = [];
@@ -27,7 +27,8 @@ function getXML(){
     //xmlhttp.open("GET","sample.xml",false); //būtu kruta iespēja izvēlēties failu
     //xmlhttp.send();
     //xmlDoc=xmlhttp.responseXML;
-    NoteObject.splice(0,3);
+    NoteObject.splice(0,NoteObject.length);
+    if (analyserContext) analyserContext.clearRect(0, 0, canvasWidth, canvasHeight);
     var steplist = xmlDoc.getElementsByTagName("step"); 
     var octlist = xmlDoc.getElementsByTagName("octave");
     var altlist = xmlDoc.getElementsByTagName("alter");

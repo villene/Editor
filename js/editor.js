@@ -44,11 +44,11 @@ function create() {
 
 function fillNote()
 {
-    if (game.input.x>60){
+    if (game.input.x>60 && cameraX===game.camera.x && cameraY===game.camera.y){
         var y=this.hgt;
         var x=this.wdt;
         
-        if (this.on===true){
+        if (this.on){
             xmlNotes.splice(x,1);
             this.on = false;
             this.setFrames(1,0, 1);
@@ -129,7 +129,7 @@ function generateXML()
         else xmlLyrics.textContent = xmlNotes[i].lyrics;
         
     }
-    alert((new XMLSerializer()).serializeToString(xmlDoc));
+    //alert((new XMLSerializer()).serializeToString(xmlDoc));
 
 };
 
@@ -161,5 +161,24 @@ function cameraDrag()
 function render() {
 
     //game.debug.renderCameraInfo(game.camera, 32, 32);
+    //game.debug.renderSpriteInputInfo(label, 32, 32);
 
+}
+
+function resetGrid()
+{
+    for(var j=0; j<gridHeight; j++)
+        {
+            for(var i=0; i<gridWidth; i++)
+                {
+                    if(note[j][i].on){
+                        note[j][i].on = false;
+                        note[j][i].setFrames(1,0, 1);
+                        note[j][i].frame = 0;}
+                }
+        }
+    lastNote = undefined;
+    xmlDoc = undefined;
+    xmlNotes.splice(0, xmlNotes.length);
+    NoteObject.splice(0, xmlNotes.length);
 }
