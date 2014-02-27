@@ -1,0 +1,6 @@
+#lyrics{
+    position: relative;
+    width: 40px;
+    z-index: 1;
+    visibility: hidden;
+}

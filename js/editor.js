@@ -1,5 +1,9 @@
-var game = new Phaser.Game(800, 500, Phaser.CANVAS, '', { preload: preload, create: create, update: update, render:render});
-var gridHeight = 35;
+var game = new Phaser.Game(800, 500, Phaser.CANVAS, 'phaser-canvas', { preload: preload, create: create, update: update, render:render});
+
+//var gridHeight = 35; with alteration
+var canvasHeight = 500;
+var canvasWidth = 800;
+var gridHeight = 60;
 var gridWidth = 100;
 var note=[];
 var xmlNotes=[];
@@ -9,42 +13,84 @@ var locationY=0;
 var cameraX=0;
 var cameraY=0;
 var label;
+var textSprite;
 var lastNote;
+var LyricText;
+var t=[];
 //var alteration = document.getElementById('alteration');
 //var lyrics = document.getElementById('lyrics');
 
 function preload() {
-        game.load.spritesheet('stance', 'assets/download.png', 20, 20, 2);
-        game.load.image('labels', 'assets/labels_min.png');
+        game.load.spritesheet('stance', 'assets/note-state.png', 20, 20, 2);
+        game.load.image('labels', 'assets/note-labels.png');
+        game.load.image('text', 'assets/text.png');
+        game.load.image('lyrtxt', 'assets/Lyric_label.png');
 }
 
 function create() {
-        game.world.setBounds(0, 0, gridWidth*20+60, gridHeight*20); 
-        //game.camera.setPosition(0, 701);
-        //create layers for buttons and note labels
+        game.world.setBounds(0, 0, gridWidth*20+60, gridHeight*20+30); 
+
+        //create layers for buttons and labels
         var noteLayer = game.add.group();
         noteLayer.z=0;
         var labelLayer = game.add.group();
         labelLayer.z=1;
-        label = game.add.sprite(0,0, 'labels');
-        //label.fixedToCamera=true;
+        label = game.add.sprite(0,0, 'labels');        
         labelLayer.add(label);
-	for (var j = 0; j<gridHeight; j++){
+        var textLayer = game.add.group();        
+        textLayer.z=1;
+        textSprite = game.add.sprite(0, canvasHeight-30,'text');
+        textLayer.add(textSprite);
+        var lyricTextLayer = game.add.group();
+        lyricTextLayer.z=2;
+        LyricText = game.add.sprite(0, canvasHeight-30, 'lyrtxt');
+        lyricTextLayer.add(LyricText);
+        
+        //set style for text
+        var style = {font: "12px Arial", align: "center"};
+               
+	for (var j = 0; j<gridHeight; j++){                       
             note[j]=[];
-        for (var i = 0; i < gridWidth; i++)
-    {
-        note[j][i] = game.add.button(60+i*20, j*20, 'stance', fillNote, note[j][i], 1,0,1);
-        note[j][i].hgt=j;
-        note[j][i].wdt=i;
-        note[j][i].on=false;
-        noteLayer.add(note[j][i]);
-    }
+            for (var i = 0; i < gridWidth; i++)
+            {
+                note[j][i] = game.add.button(60+i*20, j*20, 'stance', fillNote, note[j][i], 1,0,1);
+                note[j][i].hgt=j;
+                note[j][i].wdt=i;
+                note[j][i].on=false;
+                noteLayer.add(note[j][i]);
+            }            
 	}
+        
+        for (var i=0; i<gridWidth; i++)
+            {
+                t[i] = game.add.text(61+i*20,canvasHeight-15,'', style);
+                textLayer.add(t[i]);
+                t[i].anchor.setTo(0,0.5);                
+            }
+            
+        //draw vertical lines
+        for(var i=1; i<=gridWidth/8; i++)
+            {
+                var line = game.add.graphics(30+i*80, 0);
+                noteLayer.add(line);
+                line.lineStyle(2, 'black', 1);
+                line.moveTo(30+i*80, 0);
+                line.lineTo(30+i*80, gridHeight*20);
+                line.endFill();
+            }
+       //draw horizontal lines
+       for (var i=0; i<gridHeight; i+=12){
+            var line = game.add.graphics(30, i*10);
+            noteLayer.add(line);
+            line.lineStyle(2, 'black', 1);
+            line.moveTo(30, i*10);
+            line.lineTo(gridWidth*20+60, i*10);
+            line.endFill(); }
 }
 
 function fillNote()
 {
-    if (game.input.x>60 && cameraX===game.camera.x && cameraY===game.camera.y){
+    if (game.input.x>60 && game.input.y<470 && cameraX===game.camera.x && cameraY===game.camera.y){
         var y=this.hgt;
         var x=this.wdt;
         
@@ -54,15 +100,18 @@ function fillNote()
             this.setFrames(1,0, 1);
             this.frame = 0;
             lastNote=undefined;
+            t[x].setText('');
+            document.getElementById('lyrics').style.visibility = "hidden";
         }
         else{
         //upon clicking another note, fills the optional values of the previous note
             if(lastNote!==undefined)
                 {
-                    xmlNotes[lastNote].alteration=document.getElementById('alteration').value;
+                    //xmlNotes[lastNote].alteration=document.getElementById('alteration').value;
                     xmlNotes[lastNote].lyrics=document.getElementById('lyrics').value;
-                    document.getElementById('alteration').value="0";
-                    document.getElementById('lyrics').value="";
+                    t[lastNote].setText(document.getElementById('lyrics').value);
+                    //document.getElementById('alteration').value="0";
+                    document.getElementById('lyrics').value="";                    
                 }
 
 
@@ -73,42 +122,54 @@ function fillNote()
                         note[i][x].on=false;
                         note[i][x].setFrames(1, (note[i][x].on)?1:0, 1);
                         note[i][x].frame = (note[i][x].on)?1:0;
+                        document.getElementById('lyrics').value = xmlNotes[x].lyrics;
                         break;}
                 }
 
-            var oct = Math.floor((gridHeight-y)/7)+2;
-            var step = (gridHeight-y)%7;
+            var oct = Math.floor((gridHeight-y)/12)+2;
+            var step = (gridHeight-y)%12;
 
-            switch(step){
-                case 1: {step='C';break;}        
-                case 2: {step='D';break;}        
-                case 3: {step='E';break;}
-                case 4: {step='F';break;}        
-                case 5: {step='G';break;}        
-                case 6: {step='A';break;}        
-                case 0: {step='B'; oct--;break;}
+                switch(step){
+                    case 1: {step='C';break;}
+                    case 2: {step='C♯';break;}
+                    case 3: {step='D';break;}
+                    case 4: {step='D♯';break;}
+                    case 5: {step='E';break;}
+                    case 6: {step='F';break;}
+                    case 7: {step='F♯';break;}
+                    case 8: {step='G';break;}
+                    case 9: {step='G♯';break;}
+                    case 10: {step='A';break;}
+                    case 11: {step='A♯';break;}
+                    case 0: {step='B'; oct--;break;}
+
             }
 
             xmlNotes[x]={step:step, octave:oct};
             lastNote=x;
-            //if (this.on) xmlNotes.splice(x,1);
             this.on = true;
             this.setFrames(1, 1, 1);
-            this.frame = 1;}
+            this.frame = 1;
+            
+            //shows text input box on click
+            document.getElementById('lyrics').style.visibility = "visible";
+            document.getElementById('lyrics').style.left = x*20+47-game.camera.x+"px";
+            document.getElementById('lyrics').style.top = (y+2)*20-game.camera.y+"px";
+            document.getElementById('lyrics').focus();
+        }
     }
     else return;
+    
     //alert(xmlNotes[x].step+xmlNotes[x].octave);
     
 }
 
-//document.getElementById("XMLgen").onclick = generateXML;
-
 function generateXML()
 {
     if(lastNote!==undefined){
-            xmlNotes[lastNote].alteration=document.getElementById('alteration').value;
+            //xmlNotes[lastNote].alteration=document.getElementById('alteration').value;
             xmlNotes[lastNote].lyrics=document.getElementById('lyrics').value;
-            document.getElementById('alteration').value="0";
+            //document.getElementById('alteration').value="0";
             document.getElementById('lyrics').value="";}
        
         
@@ -121,8 +182,8 @@ function generateXML()
         var xmlOctave = xmlDoc.documentElement.appendChild(xmlDoc.createElement("octave"));
         xmlOctave.textContent = xmlNotes[i].octave;
         
-        var xmlAlt = xmlDoc.documentElement.appendChild(xmlDoc.createElement("alter"));
-        xmlAlt.textContent = xmlNotes[i].alteration;        
+        //var xmlAlt = xmlDoc.documentElement.appendChild(xmlDoc.createElement("alter"));
+        //xmlAlt.textContent = xmlNotes[i].alteration;        
         
         var xmlLyrics = xmlDoc.documentElement.appendChild(xmlDoc.createElement("text"));
         if (xmlNotes[i].lyrics==="") xmlLyrics.textContent=" ";
@@ -134,19 +195,33 @@ function generateXML()
 };
 
 function update() {
-    //game.input.disabled(game.input.x<60)?true:false;
-    //else game.input.disabled=false;
-    //camera drag
     if (game.input.mousePointer.isDown)
         {
             game.input.onDown.add(cameraDrag, this);     
             game.camera.setPosition(cameraX+locationX-game.input.x, cameraY+locationY-game.input.y);
             
         label.x=game.camera.x;
-            //label.y=-cameraY-locationY+game.input.y;    
-            //game.camera.x=cameraX+locationX-game.input.x;
-            //game.camera.y=cameraY+locationY-game.input.y;                        
-        }    
+        textSprite.y=game.camera.y+470;
+        LyricText.x=game.camera.x;
+        LyricText.y=game.camera.y+470;
+        for(var i=0; i<t.length; i++)
+        t[i].y=game.camera.y+485;                        
+        }
+        
+    //accepts text input and hides input box on ENTER
+    if(document.getElementById('lyrics').style.visibility === "visible")
+        {
+            if (game.input.keyboard.isDown(Phaser.Keyboard.ENTER))
+                {
+                    xmlNotes[lastNote].lyrics=document.getElementById('lyrics').value;
+                    t[lastNote].setText(document.getElementById('lyrics').value);
+                    document.getElementById('lyrics').value='';
+                    document.getElementById('lyrics').style.visibility = "hidden";
+                    lastNote = undefined;
+                }
+        }
+    if(cameraX!==game.camera.x || cameraY!==game.camera.y) document.getElementById('lyrics').style.visibility = "hidden";    
+        
 }
 //get the pointer and camera coordinates in the moment of mouse click
 function cameraDrag()
@@ -177,8 +252,12 @@ function resetGrid()
                         note[j][i].frame = 0;}
                 }
         }
+    for(var i=0; i<t.length; i++)
+        t[i].setText('');
     lastNote = undefined;
     xmlDoc = undefined;
     xmlNotes.splice(0, xmlNotes.length);
     NoteObject.splice(0, xmlNotes.length);
+    document.getElementById('lyrics').style.visibility = "hidden";
+    
 }

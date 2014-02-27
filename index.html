@@ -3,27 +3,27 @@
 <head> 
 	<meta charset="UTF-8" />
 	<title>Editor</title>
+        <link rel="stylesheet" type="text/css" href="css/style.css" />
 	<script type="text/javascript" src="js/phaser.min.js"></script>	
 	<script type="text/javascript" src="js/editor.js"></script>
         <script type="text/javascript" src="js/soundcheck.js"></script>
-    <style type="text/css">
-        body {
-            margin: 0;
-        }
-    </style>
+    
 </head>
 <body>
     <button id="XMLgen" onclick="generateXML();">Generate XML</button>
     <button id="reset" onclick="resetGrid();">Reset grid</button>
     <button id="switch" onclick="getXML();">Pitch test</button>
-    <select id="alteration">
+    <!--<select id="alteration">
                 <option value="0">Alteration</option>
                 <option value="-1">♭</option>
                 <option value="1">♯</option>
-    </select>
-    <input type="text" id="lyrics" placeholder="Type lyrics here"/>
+    </select>!-->
+    
     <canvas id="graph" width="800" height="500"></canvas>
-
+    <div id="phaser-canvas">
+        
+        <input type="text" id="lyrics"/>
+    </div>
 
 
 </body>

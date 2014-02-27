@@ -31,14 +31,14 @@ function getXML(){
     if (analyserContext) analyserContext.clearRect(0, 0, canvasWidth, canvasHeight);
     var steplist = xmlDoc.getElementsByTagName("step"); 
     var octlist = xmlDoc.getElementsByTagName("octave");
-    var altlist = xmlDoc.getElementsByTagName("alter");
+    //var altlist = xmlDoc.getElementsByTagName("alter");
     var textlist = xmlDoc.getElementsByTagName("text");
     
     for(var i=0; i<steplist.length; i++)
         {
             NoteObject[i]={step:steplist[i].childNodes[0].nodeValue, 
                            octave:octlist[i].childNodes[0].nodeValue,
-                           alter:altlist[i].childNodes[0].nodeValue,
+                           //alter:altlist[i].childNodes[0].nodeValue,
                            lyric:textlist[i].childNodes[0].nodeValue,
                            correct:null};
         }
@@ -118,16 +118,22 @@ function drawData(freqData){
     switch (NoteObject[i].step)
     {
         case 'C': NoteDraw=7*NoteObject[i].octave-1; break;
-        case 'D': NoteDraw=7*NoteObject[i].octave; break;
-        case 'E': NoteDraw=7*NoteObject[i].octave+1; break;
-        case 'F': NoteDraw=7*NoteObject[i].octave+2; break;
-        case 'G': NoteDraw=7*NoteObject[i].octave+3; break;
-        case 'A': NoteDraw=7*NoteObject[i].octave+4; break;
-        case 'B': NoteDraw=7*NoteObject[i].octave+5; break;
+        case 'C♯': NoteDraw=7*NoteObject[i].octave-1; break;
+        case 'D': NoteDraw=7*NoteObject[i].octave+1; break;
+        case 'D♯': NoteDraw=7*NoteObject[i].octave+1; break;
+        case 'E': NoteDraw=7*NoteObject[i].octave+2; break;
+        case 'F': NoteDraw=7*NoteObject[i].octave+3; break;
+        case 'F♯': NoteDraw=7*NoteObject[i].octave+3; break;
+        case 'G': NoteDraw=7*NoteObject[i].octave+4; break;
+        case 'G♯': NoteDraw=7*NoteObject[i].octave+4; break;
+        case 'A': NoteDraw=7*NoteObject[i].octave+5; break;
+        case 'A♯': NoteDraw=7*NoteObject[i].octave+5; break;
+        case 'B': NoteDraw=7*NoteObject[i].octave+6; break;
     }
     analyserContext.beginPath();
     analyserContext.strokeStyle='black';
-    var freq=noteToFrequency(NoteObject[i].octave, NoteObject[i].step, NoteObject[i].alter);
+    var freq=noteToFrequency(NoteObject[i].octave, NoteObject[i].step);
+    //var freq=noteToFrequency(NoteObject[i].octave, NoteObject[i].step, NoteObject[i].alter);
     var fullnote=frequencyToNote(freq);
     
     if (canvasWidth-noteLocation+60*i<canvasWidth/2+10 && canvasWidth-noteLocation+60*i>canvasWidth/2-10 && NoteObject[i].correct!==true)
@@ -203,35 +209,41 @@ function frequencyToNote(freq){
     switch(note)
     {
         case 1: {step='C'; note=1; break;}
-        case 2: {step='C♯/D♭';break;}
+        case 2: {step='C♯';break;}
         case 3: {step='D'; note=2; break;}
-        case 4: {step='D♯/E♭';break;}
+        case 4: {step='D♯';break;}
         case 5: {step='E'; note=3; break;}
         case 6: {step='F'; note=4; break;}
-        case 7: {step='F♯/G♭';break;}
+        case 7: {step='F♯';break;}
         case 8: {step='G'; note=5; break;}
-        case 9: {step='G♯/A♭';break;}
+        case 9: {step='G♯';break;}
         case 10: {step='A'; note=6; break;}
-        case 11: {step='A♯/B♭';break;}
+        case 11: {step='A♯';break;}
         case 0: {step='B'; oct--; note=7; break;}
     }
     return {step:step, oct:oct, note:note, string:step+oct};
 }
 
-function noteToFrequency(oct, step, alter){
+//function noteToFrequency(oct, step, alter){
+function noteToFrequency(oct, step){
     var freq;
     switch (step)
     {
         case 'C': step=oct*12+1; break;
+        case 'C♯': step=oct*12+2; break;
         case 'D': step=oct*12+3; break;
+        case 'D♯': step=oct*12+4; break;
         case 'E': step=oct*12+5; break;
         case 'F': step=oct*12+6; break;
+        case 'F♯': step=oct*12+7; break;
         case 'G': step=oct*12+8; break;
+        case 'G♯': step=oct*12+9; break;
         case 'A': step=oct*12+10; break;
+        case 'A♯': step=oct*12+11; break;
         case 'B': step=oct*12+12; break;
     }   
-        if(alter==='1')step+=1;
-        else if(alter==='-1')step-=1;
+        //if(alter==='1')step+=1;
+        //else if(alter==='-1')step-=1;
         
         if (step===58) freq=440;
         else{ step-=58; freq=440*Math.pow(1.059463, step);}        
