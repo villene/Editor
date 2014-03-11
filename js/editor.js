@@ -1,8 +1,8 @@
-var game = new Phaser.Game(800, 500, Phaser.CANVAS, 'phaser-canvas', { preload: preload, create: create, update: update, render:render});
-
+var game = new Phaser.Game(1024, 700, Phaser.CANVAS, 'phaser-canvas', { preload: preload, create: create, update: update, render:render});
+//this.game.canvas.id = 'editor';
 //var gridHeight = 35; with alteration
-var canvasHeight = 500;
-var canvasWidth = 800;
+var canvasHeight = 700;
+var canvasWidth = 1024;
 var gridHeight = 60;
 var gridWidth = 100;
 var note=[];
@@ -128,24 +128,25 @@ function fillNote()
 
             var oct = Math.floor((gridHeight-y)/12)+2;
             var step = (gridHeight-y)%12;
+            var alt= " ";
 
                 switch(step){
                     case 1: {step='C';break;}
-                    case 2: {step='C♯';break;}
+                    case 2: {step='C'; alt=1; break;}
                     case 3: {step='D';break;}
-                    case 4: {step='D♯';break;}
+                    case 4: {step='D'; alt=1; break;}
                     case 5: {step='E';break;}
                     case 6: {step='F';break;}
-                    case 7: {step='F♯';break;}
+                    case 7: {step='F'; alt=1; break;}
                     case 8: {step='G';break;}
-                    case 9: {step='G♯';break;}
+                    case 9: {step='G'; alt=1; break;}
                     case 10: {step='A';break;}
-                    case 11: {step='A♯';break;}
+                    case 11: {step='A'; alt=1; break;}
                     case 0: {step='B'; oct--;break;}
 
             }
 
-            xmlNotes[x]={step:step, octave:oct};
+            xmlNotes[x]={step:step, octave:oct, alteration:alt};
             lastNote=x;
             this.on = true;
             this.setFrames(1, 1, 1);
@@ -182,14 +183,28 @@ function generateXML()
         var xmlOctave = xmlDoc.documentElement.appendChild(xmlDoc.createElement("octave"));
         xmlOctave.textContent = xmlNotes[i].octave;
         
-        //var xmlAlt = xmlDoc.documentElement.appendChild(xmlDoc.createElement("alter"));
-        //xmlAlt.textContent = xmlNotes[i].alteration;        
+        var xmlAlt = xmlDoc.documentElement.appendChild(xmlDoc.createElement("alter"));
+        xmlAlt.textContent = xmlNotes[i].alteration;        
         
         var xmlLyrics = xmlDoc.documentElement.appendChild(xmlDoc.createElement("text"));
         if (xmlNotes[i].lyrics==="") xmlLyrics.textContent=" ";
         else xmlLyrics.textContent = xmlNotes[i].lyrics;
         
     }
+    var xmlURL = new XMLSerializer().serializeToString(xmlDoc);
+    var xmlName = document.getElementById("sheetName").value;
+    
+    //xmlURL="'"+xmlURL+"'";
+    window.location.href = "http://localhost/Phasr/public_html/Editor/page.php?name=" + xmlName + "&data=" + xmlURL;
+  /*  var xmlRequest = $.ajax({
+    type: 'GET',
+    data: 'xmlDoc',
+    url: "page.php"
+  
+  
+});
+ 
+xmlRequest.done( handleResponse );*/
     //alert((new XMLSerializer()).serializeToString(xmlDoc));
 
 };
@@ -201,11 +216,11 @@ function update() {
             game.camera.setPosition(cameraX+locationX-game.input.x, cameraY+locationY-game.input.y);
             
         label.x=game.camera.x;
-        textSprite.y=game.camera.y+470;
+        textSprite.y=game.camera.y+canvasHeight-30;
         LyricText.x=game.camera.x;
-        LyricText.y=game.camera.y+470;
+        LyricText.y=game.camera.y+canvasHeight-30;
         for(var i=0; i<t.length; i++)
-        t[i].y=game.camera.y+485;                        
+        t[i].y=game.camera.y+canvasHeight-15;                        
         }
         
     //accepts text input and hides input box on ENTER
@@ -261,3 +276,5 @@ function resetGrid()
     document.getElementById('lyrics').style.visibility = "hidden";
     
 }
+
+

@@ -5,25 +5,33 @@
 	<title>Editor</title>
         <link rel="stylesheet" type="text/css" href="css/style.css" />
 	<script type="text/javascript" src="js/phaser.min.js"></script>	
+	<script type="text/javascript" src="js/jquery-2.1.0.min.js"></script>
 	<script type="text/javascript" src="js/editor.js"></script>
-        <script type="text/javascript" src="js/soundcheck.js"></script>
+        <!--<script type="text/javascript" src="js/main.js"></script>
+		<script type="text/javascript" src="js/windowing.js"></script>!-->
     
 </head>
 <body>
     <button id="XMLgen" onclick="generateXML();">Generate XML</button>
+    <input  type="text" id="sheetName">
     <button id="reset" onclick="resetGrid();">Reset grid</button>
-    <button id="switch" onclick="getXML();">Pitch test</button>
-    <!--<select id="alteration">
-                <option value="0">Alteration</option>
-                <option value="-1">♭</option>
-                <option value="1">♯</option>
-    </select>!-->
+    <!--<button id="switch" onclick="getXML();">Pitch test</button>
     
-    <canvas id="graph" width="800" height="500"></canvas>
+    
+    <canvas id="graph" width="800" height="500"></canvas>!-->
     <div id="phaser-canvas">
         
         <input type="text" id="lyrics"/>
     </div>
+	<aside>
+		<form action="upload.php" method="post"
+		enctype="multipart/form-data">
+		<label for="file">Filename:</label>
+		<input type="file" name="file" id="file"><br>
+		<input type="submit" name="submit" value="Submit">
+		</form>
+	</aside>
+	
 
 
 </body>
