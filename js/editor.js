@@ -1,5 +1,5 @@
 var game = new Phaser.Game(1024, 700, Phaser.CANVAS, 'phaser-canvas', { preload: preload, create: create, update: update, render:render});
-//this.game.canvas.id = 'editor';
+
 //var gridHeight = 35; with alteration
 var canvasHeight = 700;
 var canvasWidth = 1024;
@@ -29,7 +29,7 @@ function preload() {
 
 function create() {
         game.world.setBounds(0, 0, gridWidth*20+60, gridHeight*20+30); 
-
+        this.game.canvas.id = 'editor';
         //create layers for buttons and labels
         var noteLayer = game.add.group();
         noteLayer.z=0;
@@ -90,7 +90,7 @@ function create() {
 
 function fillNote()
 {
-    if (game.input.x>60 && game.input.y<470 && cameraX===game.camera.x && cameraY===game.camera.y){
+    if (game.input.x>60 && game.input.y<canvasHeight-30 && cameraX===game.camera.x && cameraY===game.camera.y){
         var y=this.hgt;
         var x=this.wdt;
         
@@ -107,11 +107,11 @@ function fillNote()
         //upon clicking another note, fills the optional values of the previous note
             if(lastNote!==undefined)
                 {
-                    //xmlNotes[lastNote].alteration=document.getElementById('alteration').value;
+                    
                     xmlNotes[lastNote].lyrics=document.getElementById('lyrics').value;
-                    t[lastNote].setText(document.getElementById('lyrics').value);
-                    //document.getElementById('alteration').value="0";
-                    document.getElementById('lyrics').value="";                    
+                    t[lastNote].setText(document.getElementById('lyrics').value);                    
+                    document.getElementById('lyrics').value="";
+                    
                 }
 
 
@@ -127,9 +127,8 @@ function fillNote()
                 }
 
             var oct = Math.floor((gridHeight-y)/12)+2;
-            var step = (gridHeight-y)%12;
-            var alt= " ";
-
+            var step = (gridHeight-y)%12;            
+            var alt;
                 switch(step){
                     case 1: {step='C';break;}
                     case 2: {step='C'; alt=1; break;}
@@ -175,22 +174,29 @@ function generateXML()
        
         
     xmlDoc = document.implementation.createDocument(null, "score-partwise", null);
-    
+ 
     for (var i=0; i<xmlNotes.length; i++){
-
-        var xmlStep = xmlDoc.documentElement.appendChild(xmlDoc.createElement("step"));
+        
+        var noteParent = xmlDoc.documentElement.appendChild(xmlDoc.createElement("note"));
+        var pitchParent = noteParent.appendChild(xmlDoc.createElement("pitch"));
+        var xmlStep = pitchParent.appendChild(xmlDoc.createElement("step"));
         xmlStep.textContent = xmlNotes[i].step;
-        var xmlOctave = xmlDoc.documentElement.appendChild(xmlDoc.createElement("octave"));
+        if (xmlNotes[i].alteration!==undefined)
+            {
+                var xmlAlt = pitchParent.appendChild(xmlDoc.createElement("alter"));
+                xmlAlt.textContent = xmlNotes[i].alteration; 
+            }
+        var xmlOctave = pitchParent.appendChild(xmlDoc.createElement("octave"));;
         xmlOctave.textContent = xmlNotes[i].octave;
         
-        var xmlAlt = xmlDoc.documentElement.appendChild(xmlDoc.createElement("alter"));
-        xmlAlt.textContent = xmlNotes[i].alteration;        
-        
-        var xmlLyrics = xmlDoc.documentElement.appendChild(xmlDoc.createElement("text"));
-        if (xmlNotes[i].lyrics==="") xmlLyrics.textContent=" ";
-        else xmlLyrics.textContent = xmlNotes[i].lyrics;
+        if (xmlNotes[i].lyrics!==""){
+        var lyricParent = noteParent.appendChild(xmlDoc.createElement("lyric"));         
+        var xmlLyrics = lyricParent.appendChild(xmlDoc.createElement("text"));
+        xmlLyrics.textContent = xmlNotes[i].lyrics;
+        }
         
     }
+    //alert (new XMLSerializer().serializeToString(xmlDoc));
     var xmlURL = new XMLSerializer().serializeToString(xmlDoc);
     var xmlName = document.getElementById("sheetName").value;
     

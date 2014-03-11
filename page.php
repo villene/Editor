@@ -6,7 +6,7 @@ fwrite($file, $data);
 fclose($file);*/
 
 
-    echo "HI! Ajax arrived here and this code it's being executed!";
+    echo "XML saved";
 
     //I load a string to be the contents of the XML file
     $filename = $_GET['name'];

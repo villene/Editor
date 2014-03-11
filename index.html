@@ -12,25 +12,33 @@
     
 </head>
 <body>
-    <button id="XMLgen" onclick="generateXML();">Generate XML</button>
-    <input  type="text" id="sheetName">
-    <button id="reset" onclick="resetGrid();">Reset grid</button>
-    <!--<button id="switch" onclick="getXML();">Pitch test</button>
+<!--<button id="switch" onclick="getXML();">Pitch test</button>
     
     
     <canvas id="graph" width="800" height="500"></canvas>!-->
-    <div id="phaser-canvas">
-        
-        <input type="text" id="lyrics"/>
-    </div>
-	<aside>
+    
+	
+    <header id="main">
+	
+	
+    
+	<div id="upload">
 		<form action="upload.php" method="post"
 		enctype="multipart/form-data">
 		<label for="file">Filename:</label>
 		<input type="file" name="file" id="file"><br>
 		<input type="submit" name="submit" value="Submit">
 		</form>
-	</aside>
+	</div>
+	
+	<button id="XMLgen" onclick="generateXML();">Generate XML</button>
+    <input  type="text" id="sheetName" placeholder="XML name">
+    <button id="reset" onclick="resetGrid();">Reset grid</button>
+	</header>
+	<div id="phaser-canvas">   
+        <input type="text" id="lyrics"/>
+    </div>
+	
 	
 
 
