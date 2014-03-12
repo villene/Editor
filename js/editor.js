@@ -168,6 +168,7 @@ function generateXML()
     var xmlDoc;
     var xmlData;
     var xmlName = document.getElementById("sheetName").value;
+    
     if(lastNote!==undefined){
             //xmlNotes[lastNote].alteration=document.getElementById('alteration').value;
             xmlNotes[lastNote].lyrics=document.getElementById('lyrics').value;
@@ -180,21 +181,31 @@ function generateXML()
     for (var i=0; i<xmlNotes.length; i++){
         
         var noteParent = xmlDoc.documentElement.appendChild(xmlDoc.createElement("note"));
-        var pitchParent = noteParent.appendChild(xmlDoc.createElement("pitch"));
-        var xmlStep = pitchParent.appendChild(xmlDoc.createElement("step"));
-        xmlStep.textContent = xmlNotes[i].step;
-        if (xmlNotes[i].alteration!==undefined)
-            {
-                var xmlAlt = pitchParent.appendChild(xmlDoc.createElement("alter"));
-                xmlAlt.textContent = xmlNotes[i].alteration; 
-            }
-        var xmlOctave = pitchParent.appendChild(xmlDoc.createElement("octave"));;
-        xmlOctave.textContent = xmlNotes[i].octave;
         
-        if (xmlNotes[i].lyrics!==""){
-        var lyricParent = noteParent.appendChild(xmlDoc.createElement("lyric"));         
-        var xmlLyrics = lyricParent.appendChild(xmlDoc.createElement("text"));
-        xmlLyrics.textContent = xmlNotes[i].lyrics;
+        //creates a rest element, if grid left unchecked
+        if (xmlNotes[i]===undefined)
+            {
+                noteParent.appendChild(xmlDoc.createElement("rest"));
+                noteParent.appendChild(xmlDoc.createElement("duration")).textContent = 4; 
+            }
+            
+        else{
+            var pitchParent = noteParent.appendChild(xmlDoc.createElement("pitch"));
+            pitchParent.appendChild(xmlDoc.createElement("step")).textContent = xmlNotes[i].step;
+                        
+            if (xmlNotes[i].alteration!==undefined)
+                {
+                    pitchParent.appendChild(xmlDoc.createElement("alter")).textContent = xmlNotes[i].alteration;                    
+                }
+                
+            pitchParent.appendChild(xmlDoc.createElement("octave")).textContent = xmlNotes[i].octave;
+            
+            noteParent.appendChild(xmlDoc.createElement("duration")).textContent = 4;
+            
+            if (xmlNotes[i].lyrics!==""){
+                var lyricParent = noteParent.appendChild(xmlDoc.createElement("lyric"));         
+                lyricParent.appendChild(xmlDoc.createElement("text")).textContent = xmlNotes[i].lyrics;               
+            }
         }
         
     }
