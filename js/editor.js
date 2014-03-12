@@ -7,7 +7,6 @@ var gridHeight = 60;
 var gridWidth = 100;
 var note=[];
 var xmlNotes=[];
-window.xmlDoc;
 var locationX=0;
 var locationY=0;
 var cameraX=0;
@@ -166,6 +165,9 @@ function fillNote()
 
 function generateXML()
 {
+    var xmlDoc;
+    var xmlData;
+    var xmlName = document.getElementById("sheetName").value;
     if(lastNote!==undefined){
             //xmlNotes[lastNote].alteration=document.getElementById('alteration').value;
             xmlNotes[lastNote].lyrics=document.getElementById('lyrics').value;
@@ -197,21 +199,25 @@ function generateXML()
         
     }
     //alert (new XMLSerializer().serializeToString(xmlDoc));
-    var xmlURL = new XMLSerializer().serializeToString(xmlDoc);
-    var xmlName = document.getElementById("sheetName").value;
+    
+    
+    if (xmlName!==""){
+        
+        xmlData = vkbeautify.xml(new XMLSerializer().serializeToString(xmlDoc));
+        console.log(xmlData);
+        $.ajax({
+        url: "xmlgen.php",
+        method: "get",
+        data:   { 'xmlDoc' : xmlData, 'xmlName': xmlName}});
+    }
+   else alert("Please specify a file name!");
     
     //xmlURL="'"+xmlURL+"'";
-    window.location.href = "http://localhost/Phasr/public_html/Editor/page.php?name=" + xmlName + "&data=" + xmlURL;
-  /*  var xmlRequest = $.ajax({
-    type: 'GET',
-    data: 'xmlDoc',
-    url: "page.php"
-  
-  
-});
+    //window.location.href = "http://localhost/Phasr/public_html/Editor/page.php?name=" + xmlName + "&data=" + xmlURL;
+
  
-xmlRequest.done( handleResponse );*/
-    //alert((new XMLSerializer()).serializeToString(xmlDoc));
+
+
 
 };
 
