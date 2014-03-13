@@ -33,16 +33,16 @@
 		<input type="submit" name="submit" value="Submit">
 		</form>
             </div>
-            <div id="filelist">
+            <div>
                 <h3>File list</h3>
             <?php
             
                 //$dir    = 'upload/xml/';
                 $files1 = array_filter(glob('upload/xml/*'),'is_file');
                 //$files1 = scandir($dir, 0);
-                echo '<ul>';
+                echo '<ul id="filelist">';
                 foreach ($files1 as $item){
-                    echo '<li>'.basename($item).'</li>';
+                    echo '<li class="file"><button class="loadfile" onclick="loadFile(&#34'.basename($item).'&#34);">Load</button>'.basename($item).'</li>';
                 }
                 echo '</ul>';
                 //echo($files1);

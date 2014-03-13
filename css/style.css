@@ -25,3 +25,12 @@ body{
 #editor{
     border: solid black;
 }
+
+.file{
+    list-style: none;
+}
+
+#filelist{
+    height: 560px;
+    overflow: auto;
+}

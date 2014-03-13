@@ -1,10 +1,9 @@
 var game = new Phaser.Game(800, 700, Phaser.CANVAS, 'phaser-canvas', { preload: preload, create: create, update: update, render:render});
 
-//var gridHeight = 35; with alteration
 var canvasHeight = 700;
 var canvasWidth = 800;
 var gridHeight = 60;
-var gridWidth = 100;
+var gridWidth = 120;
 var note=[];
 var xmlNotes=[];
 var locationX=0;
@@ -16,8 +15,6 @@ var textSprite;
 var lastNote;
 var LyricText;
 var t=[];
-//var alteration = document.getElementById('alteration');
-//var lyrics = document.getElementById('lyrics');
 
 function preload() {
         game.load.spritesheet('stance', 'assets/note-state.png', 20, 20, 2);
@@ -144,8 +141,9 @@ function fillNote()
 
             }
 
-            xmlNotes[x]={step:step, octave:oct, alteration:alt};
+            xmlNotes[x]={step:step, octave:oct, alteration:alt, duration:4};
             lastNote=x;
+            console.log(xmlNotes[x]);
             this.on = true;
             this.setFrames(1, 1, 1);
             this.frame = 1;
@@ -157,10 +155,7 @@ function fillNote()
             document.getElementById('lyrics').focus();
         }
     }
-    else return;
-    
-    //alert(xmlNotes[x].step+xmlNotes[x].octave);
-    
+    else return;        
 }
 
 function generateXML()
@@ -169,10 +164,8 @@ function generateXML()
     var xmlData;
     var xmlName = document.getElementById("sheetName").value;
     
-    if(lastNote!==undefined){
-            //xmlNotes[lastNote].alteration=document.getElementById('alteration').value;
-            xmlNotes[lastNote].lyrics=document.getElementById('lyrics').value;
-            //document.getElementById('alteration').value="0";
+    if(lastNote!==undefined){            
+            xmlNotes[lastNote].lyrics=document.getElementById('lyrics').value;            
             document.getElementById('lyrics').value="";}
        
         
@@ -200,7 +193,7 @@ function generateXML()
                 
             pitchParent.appendChild(xmlDoc.createElement("octave")).textContent = xmlNotes[i].octave;
             
-            noteParent.appendChild(xmlDoc.createElement("duration")).textContent = 4;
+            noteParent.appendChild(xmlDoc.createElement("duration")).textContent =  xmlNotes[i].duration;
             
             if (xmlNotes[i].lyrics!==""){
                 var lyricParent = noteParent.appendChild(xmlDoc.createElement("lyric"));         
@@ -215,22 +208,101 @@ function generateXML()
     if (xmlName!==""){
         
         xmlData = vkbeautify.xml(new XMLSerializer().serializeToString(xmlDoc));
-        console.log(xmlData);
         $.ajax({
         url: "xmlgen.php",
         method: "get",
         data:   { 'xmlDoc' : xmlData, 'xmlName': xmlName}});
     }
    else alert("Please specify a file name!");
-    
-    //xmlURL="'"+xmlURL+"'";
-    //window.location.href = "http://localhost/Phasr/public_html/Editor/page.php?name=" + xmlName + "&data=" + xmlURL;
-
- 
-
-
-
 };
+
+function resetGrid()
+{
+    for(var j=0; j<gridHeight; j++)
+        {
+            for(var i=0; i<gridWidth; i++)
+                {
+                    if(note[j][i].on){
+                        note[j][i].on = false;
+                        note[j][i].setFrames(1,0, 1);
+                        note[j][i].frame = 0;}
+                }
+        }
+    for(var i=0; i<t.length; i++)
+        t[i].setText('');
+    lastNote = undefined;
+    xmlNotes.splice(0, xmlNotes.length);
+    document.getElementById('lyrics').style.visibility = "hidden";    
+};
+
+function loadFile(fileName){    
+        if(!confirm("Any unsaved changes will be lost. Continue?")){
+            return;
+        }
+        else{
+            resetGrid();
+            
+            xmlhttp=new XMLHttpRequest();
+            xmlhttp.open("GET","upload/xml/"+fileName,false);
+            xmlhttp.send();
+            var xmlDoc=xmlhttp.responseXML;
+            
+            var notes = xmlDoc.getElementsByTagName("note");
+            for(var i= 0, l=notes.length; i<l; i++)
+            {
+                var step, octave, alteration, duration, lyrics = undefined;            
+                if(notes[i].getElementsByTagName("rest")[0]) continue;
+                
+                if(notes[i].getElementsByTagName("step")[0]){
+                    step = notes[i].getElementsByTagName("step")[0].childNodes[0].nodeValue;
+                }
+                if(notes[i].getElementsByTagName("octave")[0]){
+                    octave = notes[i].getElementsByTagName("octave")[0].childNodes[0].nodeValue;
+                }
+                if(notes[i].getElementsByTagName("alter")[0]){
+                     alteration = notes[i].getElementsByTagName("alter")[0].childNodes[0].nodeValue;
+                }
+                else alteration=undefined;
+                
+                if(notes[i].getElementsByTagName("duration")[0]){
+                     duration = notes[i].getElementsByTagName("duration")[0].childNodes[0].nodeValue;
+                }
+                if(notes[i].getElementsByTagName("text")[0]){
+                     lyrics = notes[i].getElementsByTagName("text")[0].childNodes[0].nodeValue;
+                }
+                else lyrics="";
+                
+                xmlNotes[i] = {step:step, octave:octave, alteration:alteration, duration:duration, lyrics:lyrics};
+            }
+        console.log(xmlNotes);
+        
+        for(var x=0; x<notes.length; x++)
+            {
+                if (!xmlNotes[x]) continue;
+                
+                    var y;
+                    switch(xmlNotes[x].step)
+                    {
+                        case 'C': {y=1; break;}
+                        case 'D': {y=3; break;}
+                        case 'E': {y=5; break;}
+                        case 'F': {y=6; break;}
+                        case 'G': {y=8; break;}
+                        case 'A': {y=10; break;}
+                        case 'B': {y=12; break;}
+                    }
+                    y+=(xmlNotes[x].octave-2)*12;
+                    if(xmlNotes[x].alteration) y+=parseInt(xmlNotes[x].alteration);
+                    y=gridHeight-y;
+                    console.log(y);
+                    note[y][x].on = true;
+                    note[y][x].setFrames(1, 1, 1);
+                    note[y][x].frame = 1;
+                    
+                    t[x].setText(xmlNotes[x].lyrics);
+                
+            }
+}}
 
 function update() {
     if (game.input.mousePointer.isDown)
@@ -258,8 +330,7 @@ function update() {
                     lastNote = undefined;
                 }
         }
-    if(cameraX!==game.camera.x || cameraY!==game.camera.y) document.getElementById('lyrics').style.visibility = "hidden";    
-        
+    if(cameraX!==game.camera.x || cameraY!==game.camera.y) document.getElementById('lyrics').style.visibility = "hidden";            
 }
 //get the pointer and camera coordinates in the moment of mouse click
 function cameraDrag()
@@ -267,8 +338,7 @@ function cameraDrag()
     locationX=game.input.x;
     locationY=game.input.y;
     cameraX=game.camera.x;
-    cameraY=game.camera.y;
-    
+    cameraY=game.camera.y;    
 }
 
 function render() {
@@ -277,27 +347,3 @@ function render() {
     //game.debug.renderSpriteInputInfo(label, 32, 32);
 
 }
-
-function resetGrid()
-{
-    for(var j=0; j<gridHeight; j++)
-        {
-            for(var i=0; i<gridWidth; i++)
-                {
-                    if(note[j][i].on){
-                        note[j][i].on = false;
-                        note[j][i].setFrames(1,0, 1);
-                        note[j][i].frame = 0;}
-                }
-        }
-    for(var i=0; i<t.length; i++)
-        t[i].setText('');
-    lastNote = undefined;
-    xmlDoc = undefined;
-    xmlNotes.splice(0, xmlNotes.length);
-    NoteObject.splice(0, xmlNotes.length);
-    document.getElementById('lyrics').style.visibility = "hidden";
-    
-}
-
-
