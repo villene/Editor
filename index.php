@@ -23,14 +23,33 @@
 	
 	
     
-	<div id="upload">
+	<aside id="upload">
+            <div>
+            <h3>File Upload</h3>
 		<form action="upload.php" method="post"
 		enctype="multipart/form-data">
 		<label for="file">Filename:</label>
 		<input type="file" name="file" id="file"><br>
 		<input type="submit" name="submit" value="Submit">
 		</form>
-	</div>
+            </div>
+            <div id="filelist">
+                <h3>File list</h3>
+            <?php
+            
+                //$dir    = 'upload/xml/';
+                $files1 = array_filter(glob('upload/xml/*'),'is_file');
+                //$files1 = scandir($dir, 0);
+                echo '<ul>';
+                foreach ($files1 as $item){
+                    echo '<li>'.basename($item).'</li>';
+                }
+                echo '</ul>';
+                //echo($files1);
+               // print_r($files2);
+            ?>
+            </div>
+	</aside>
 	
 	<button id="XMLgen" onclick="generateXML();">Generate XML</button>
     <input  type="text" id="sheetName" placeholder="XML name">

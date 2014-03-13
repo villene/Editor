@@ -111,7 +111,7 @@ function drawData(freqData){
     
     analyserContext.font="12px Arial";
     
-    Note = frequencyToNote(autoCorrelate(freqData));
+    //Note = frequencyToNote(autoCorrelate(freqData));
     
     for(var i=0; i<NoteObject.length; i++)
         {                       

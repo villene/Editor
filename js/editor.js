@@ -1,8 +1,8 @@
-var game = new Phaser.Game(1024, 700, Phaser.CANVAS, 'phaser-canvas', { preload: preload, create: create, update: update, render:render});
+var game = new Phaser.Game(800, 700, Phaser.CANVAS, 'phaser-canvas', { preload: preload, create: create, update: update, render:render});
 
 //var gridHeight = 35; with alteration
 var canvasHeight = 700;
-var canvasWidth = 1024;
+var canvasWidth = 800;
 var gridHeight = 60;
 var gridWidth = 100;
 var note=[];

@@ -16,8 +16,9 @@ body{
 
 #upload{  
 
-    margin-left: 700px;
+    float: right;
     display: inline-block;
+    width: 290px;
    
 }
 
