@@ -28,7 +28,7 @@ function preload() {
 function create() {
         game.world.setBounds(0, 0, 800, gridHeight*20+30); 
         this.game.canvas.id = 'editor';
-        //create layers for buttons and labels
+        //create layers for buttons and labels 
         noteLayer = game.add.group();
         noteLayer.z=0;
         var labelLayer = game.add.group();
@@ -155,7 +155,7 @@ function fillNote()
             
             //shows text input box on click
             document.getElementById('lyrics').style.visibility = "visible";
-            document.getElementById('lyrics').style.left = x*20+47-game.camera.x+"px";
+            document.getElementById('lyrics').style.left = x*20+47+gridX+"px";
             document.getElementById('lyrics').style.top = (y+2)*20-game.camera.y+"px";
             document.getElementById('lyrics').focus();
         }
