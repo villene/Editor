@@ -10,10 +10,12 @@ var locationX=0;
 var locationY=0;
 var cameraX=0;
 var cameraY=0;
+var gridX=0;
 var label;
-var textSprite;
 var lastNote;
-var LyricText;
+var noteLayer;
+var textLayer;
+var lyricLabelLayer;
 var t=[];
 
 function preload() {
@@ -24,23 +26,25 @@ function preload() {
 }
 
 function create() {
-        game.world.setBounds(0, 0, gridWidth*20+60, gridHeight*20+30); 
+        game.world.setBounds(0, 0, 800, gridHeight*20+30); 
         this.game.canvas.id = 'editor';
         //create layers for buttons and labels
-        var noteLayer = game.add.group();
+        noteLayer = game.add.group();
         noteLayer.z=0;
         var labelLayer = game.add.group();
         labelLayer.z=1;
         label = game.add.sprite(0,0, 'labels');        
         labelLayer.add(label);
-        var textLayer = game.add.group();        
-        textLayer.z=1;
-        textSprite = game.add.sprite(0, canvasHeight-30,'text');
-        textLayer.add(textSprite);
-        var lyricTextLayer = game.add.group();
-        lyricTextLayer.z=2;
-        LyricText = game.add.sprite(0, canvasHeight-30, 'lyrtxt');
-        lyricTextLayer.add(LyricText);
+        lyricLabelLayer = game.add.group();
+        lyricLabelLayer.z=1;
+        var textSprite = game.add.sprite(0, canvasHeight-30,'text');
+        lyricLabelLayer.add(textSprite);
+        var LyricText = game.add.sprite(0, canvasHeight-30, 'lyrtxt');
+        lyricLabelLayer.add(LyricText);
+        
+        
+        textLayer = game.add.group();        
+        textLayer.z=2;
         
         //set style for text
         var style = {font: "12px Arial", align: "center"};
@@ -54,8 +58,9 @@ function create() {
                 note[j][i].wdt=i;
                 note[j][i].on=false;
                 noteLayer.add(note[j][i]);
-            }            
+            }
 	}
+        
         
         for (var i=0; i<gridWidth; i++)
             {
@@ -308,14 +313,17 @@ function update() {
     if (game.input.mousePointer.isDown)
         {
             game.input.onDown.add(cameraDrag, this);     
-            game.camera.setPosition(cameraX+locationX-game.input.x, cameraY+locationY-game.input.y);
+            game.camera.setPosition(0, cameraY+locationY-game.input.y);
+            if (locationX!==0) {
+                noteLayer.x = gridX+game.input.x-locationX;
+                textLayer.x = gridX+game.input.x-locationX;   
+                
+            }
             
-        label.x=game.camera.x;
-        textSprite.y=game.camera.y+canvasHeight-30;
-        LyricText.x=game.camera.x;
-        LyricText.y=game.camera.y+canvasHeight-30;
-        for(var i=0; i<t.length; i++)
-        t[i].y=game.camera.y+canvasHeight-15;                        
+        lyricLabelLayer.y=game.camera.y;
+        textLayer.y = game.camera.y;
+        
+                                      
         }
         
     //accepts text input and hides input box on ENTER
@@ -335,15 +343,16 @@ function update() {
 //get the pointer and camera coordinates in the moment of mouse click
 function cameraDrag()
 {
+    gridX=noteLayer.x;
     locationX=game.input.x;
     locationY=game.input.y;
-    cameraX=game.camera.x;
     cameraY=game.camera.y;    
 }
 
 function render() {
 
     //game.debug.renderCameraInfo(game.camera, 32, 32);
+    game.debug.renderInputInfo(32, 32);
     //game.debug.renderSpriteInputInfo(label, 32, 32);
 
 }
