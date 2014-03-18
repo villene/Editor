@@ -6,8 +6,8 @@ var gridHeight = 60;
 var gridWidth = 120;
 var note=[];
 var xmlNotes=[];
-var locationX=0;
-var locationY=0;
+var cursorX=0;
+var cursorY=0;
 var cameraX=0;
 var cameraY=0;
 var gridX=0;
@@ -146,7 +146,7 @@ function fillNote()
 
             }
 
-            xmlNotes[x]={step:step, octave:oct, alteration:alt, duration:4};
+            xmlNotes[x]={step:step, octave:oct, alteration:alt, duration:2};
             lastNote=x;
             console.log(xmlNotes[x]);
             this.on = true;
@@ -184,7 +184,7 @@ function generateXML()
         if (xmlNotes[i]===undefined)
             {
                 noteParent.appendChild(xmlDoc.createElement("rest"));
-                noteParent.appendChild(xmlDoc.createElement("duration")).textContent = 4; 
+                noteParent.appendChild(xmlDoc.createElement("duration")).textContent = 2; 
             }
             
         else{
@@ -213,10 +213,11 @@ function generateXML()
     if (xmlName!==""){
         
         xmlData = vkbeautify.xml(new XMLSerializer().serializeToString(xmlDoc));
-        $.ajax({
+        $.post("xmlgen.php", { data: xmlData });
+        /*$.ajax({
         url: "xmlgen.php",
         method: "get",
-        data:   { 'xmlDoc' : xmlData, 'xmlName': xmlName}});
+        data:   { 'xmlDoc' : xmlData, 'xmlName': xmlName}});*/
     }
    else alert("Please specify a file name!");
 };
@@ -313,10 +314,12 @@ function update() {
     if (game.input.mousePointer.isDown)
         {
             game.input.onDown.add(cameraDrag, this);     
-            game.camera.setPosition(0, cameraY+locationY-game.input.y);
-            if (locationX!==0) {
-                noteLayer.x = gridX+game.input.x-locationX;
-                textLayer.x = gridX+game.input.x-locationX;   
+            game.camera.setPosition(0, cameraY+cursorY-game.input.y);
+            console.log(noteLayer.x);
+            if (cursorX!==0 && (noteLayer.x<=0 || noteLayer.x+gridWidth*20<canvasWidth)){
+               // if (noteLayer.x>0) {noteLayer.x=0; gridX=0;}
+                noteLayer.x = gridX+game.input.x-cursorX;
+                textLayer.x = gridX+game.input.x-cursorX;   
                 
             }
             
@@ -343,16 +346,18 @@ function update() {
 //get the pointer and camera coordinates in the moment of mouse click
 function cameraDrag()
 {
-    gridX=noteLayer.x;
-    locationX=game.input.x;
-    locationY=game.input.y;
+    if (noteLayer.x>0) {gridX=0; noteLayer.x=0;} 
+    else if (noteLayer.x+gridWidth*20<canvasWidth) {gridX=-gridWidth*20+canvasWidth; noteLayer.x=-gridWidth*20+canvasWidth;}
+    else gridX=noteLayer.x;
+    cursorX=game.input.x;
+    cursorY=game.input.y;
     cameraY=game.camera.y;    
 }
 
 function render() {
 
     //game.debug.renderCameraInfo(game.camera, 32, 32);
-    game.debug.renderInputInfo(32, 32);
+    //game.debug.renderInputInfo(32, 32);
     //game.debug.renderSpriteInputInfo(label, 32, 32);
 
 }

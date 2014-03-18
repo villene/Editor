@@ -2,8 +2,8 @@
 
 
   echo "WHAT IS HAPPENING....";
-  $filename = $_GET['xmlName'];
-  $exemel = simplexml_load_string($_GET['xmlDoc']);
+  $filename = "test"; //$_GET['xmlName'];
+  $exemel = simplexml_load_string($_POST['data']);
   
   $exemel->asXml("upload/xml/".$filename.'.xml');
 
