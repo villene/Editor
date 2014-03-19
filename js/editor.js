@@ -175,7 +175,7 @@ function generateXML()
        
         
     xmlDoc = document.implementation.createDocument(null, "score-partwise", null);
- 
+    xmlDoc.documentElement.appendChild(xmlDoc.createElement("movement-title")).textContent = xmlName;
     for (var i=0; i<xmlNotes.length; i++){
         
         var noteParent = xmlDoc.documentElement.appendChild(xmlDoc.createElement("note"));

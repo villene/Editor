@@ -1,24 +1,5 @@
-<?php
-
-
-  echo "WHAT IS HAPPENING....";
-  $filename = "test"; //$_GET['xmlName'];
+<?php  
   $exemel = simplexml_load_string($_POST['data']);
-  
+  $filename = $exemel->{'movement-title'};
   $exemel->asXml("upload/xml/".$filename.'.xml');
-
-
-    /*echo "XML saved";
-
-    //I load a string to be the contents of the XML file
-    
-    
-    
-    echo $exemel;
-    // I save the file as following:
-    $exemel->asXml("upload/xml/".$filename.'.xml');
-    echo 1;*/
-
-
-
 ?>
