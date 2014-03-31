@@ -1,9 +1,9 @@
-var game = new Phaser.Game(800, 700, Phaser.CANVAS, 'phaser-canvas', { preload: preload, create: create, update: update, render:render});
+var game = new Phaser.Game(800, 750, Phaser.CANVAS, 'phaser-canvas', { preload: preload, create: create, update: update, render:render});
 
-var canvasHeight = 700;
+var canvasHeight = 750;
 var canvasWidth = 800;
-var gridHeight = 60;
-var gridWidth = 120;
+var gridHeight = 36;
+var gridWidth = 200;
 var note=[];
 var xmlNotes=[];
 var cursorX=0;
@@ -147,8 +147,8 @@ function fillNote()
             }
 
             xmlNotes[x]={step:step, octave:oct, alteration:alt, duration:2};
-            lastNote=x;
             console.log(xmlNotes[x]);
+            lastNote=x;            
             this.on = true;
             this.setFrames(1, 1, 1);
             this.frame = 1;
@@ -200,7 +200,7 @@ function generateXML()
             
             noteParent.appendChild(xmlDoc.createElement("duration")).textContent =  xmlNotes[i].duration;
             
-            if (xmlNotes[i].lyrics!==""){
+            if (xmlNotes[i].lyrics!=="" || xmlNotes[i].lyrics!==undefined){
                 var lyricParent = noteParent.appendChild(xmlDoc.createElement("lyric"));         
                 lyricParent.appendChild(xmlDoc.createElement("text")).textContent = xmlNotes[i].lyrics;               
             }
@@ -224,6 +224,10 @@ function generateXML()
 
 function resetGrid()
 {
+    if(!confirm("Are you sure?")){
+        return;
+    }
+    else{
     for(var j=0; j<gridHeight; j++)
         {
             for(var i=0; i<gridWidth; i++)
@@ -238,7 +242,8 @@ function resetGrid()
         t[i].setText('');
     lastNote = undefined;
     xmlNotes.splice(0, xmlNotes.length);
-    document.getElementById('lyrics').style.visibility = "hidden";    
+    document.getElementById('lyrics').style.visibility = "hidden";
+    }
 };
 
 function loadFile(fileName){    
@@ -280,7 +285,7 @@ function loadFile(fileName){
                 
                 xmlNotes[i] = {step:step, octave:octave, alteration:alteration, duration:duration, lyrics:lyrics};
             }
-        console.log(xmlNotes);
+        //console.log(xmlNotes);
         
         for(var x=0; x<notes.length; x++)
             {
@@ -299,8 +304,7 @@ function loadFile(fileName){
                     }
                     y+=(xmlNotes[x].octave-2)*12;
                     if(xmlNotes[x].alteration) y+=parseInt(xmlNotes[x].alteration);
-                    y=gridHeight-y;
-                    console.log(y);
+                    y=gridHeight-y;                    
                     note[y][x].on = true;
                     note[y][x].setFrames(1, 1, 1);
                     note[y][x].frame = 1;
@@ -314,8 +318,7 @@ function update() {
     if (game.input.mousePointer.isDown)
         {
             game.input.onDown.add(cameraDrag, this);     
-            game.camera.setPosition(0, cameraY+cursorY-game.input.y);
-            console.log(noteLayer.x);
+            game.camera.setPosition(0, cameraY+cursorY-game.input.y);            
             if (cursorX!==0 && (noteLayer.x<=0 || noteLayer.x+gridWidth*20<canvasWidth)){
                // if (noteLayer.x>0) {noteLayer.x=0; gridX=0;}
                 noteLayer.x = gridX+game.input.x-cursorX;
