@@ -7,9 +7,7 @@ var gridWidth = 200;
 var note=[];
 var xmlNotes=[];
 var cursorX=0;
-var cursorY=0;
 var cameraX=0;
-var cameraY=0;
 var gridX=0;
 var label;
 var lastNote;
@@ -91,7 +89,7 @@ function create() {
 
 function fillNote()
 {
-    if (game.input.x>60 && game.input.y<canvasHeight-30 && cameraX===game.camera.x && cameraY===game.camera.y){
+    if (game.input.x>60 && game.input.y<canvasHeight-30 && gridX===noteLayer.x){
         var y=this.hgt;
         var x=this.wdt;
         
@@ -156,7 +154,7 @@ function fillNote()
             //shows text input box on click
             document.getElementById('lyrics').style.visibility = "visible";
             document.getElementById('lyrics').style.left = x*20+47+gridX+"px";
-            document.getElementById('lyrics').style.top = (y+2)*20-game.camera.y+"px";
+            document.getElementById('lyrics').style.top = (y+2)*20+"px";
             document.getElementById('lyrics').focus();
         }
     }
@@ -317,19 +315,13 @@ function loadFile(fileName){
 function update() {
     if (game.input.mousePointer.isDown)
         {
-            game.input.onDown.add(cameraDrag, this);     
-            game.camera.setPosition(0, cameraY+cursorY-game.input.y);            
+            game.input.onDown.add(cameraDrag, this);               
             if (cursorX!==0 && (noteLayer.x<=0 || noteLayer.x+gridWidth*20<canvasWidth)){
                // if (noteLayer.x>0) {noteLayer.x=0; gridX=0;}
                 noteLayer.x = gridX+game.input.x-cursorX;
                 textLayer.x = gridX+game.input.x-cursorX;   
                 
-            }
-            
-        lyricLabelLayer.y=game.camera.y;
-        textLayer.y = game.camera.y;
-        
-                                      
+            }               
         }
         
     //accepts text input and hides input box on ENTER
@@ -344,7 +336,7 @@ function update() {
                     lastNote = undefined;
                 }
         }
-    if(cameraX!==game.camera.x || cameraY!==game.camera.y) document.getElementById('lyrics').style.visibility = "hidden";            
+    if(gridX!==noteLayer.x) document.getElementById('lyrics').style.visibility = "hidden";            
 }
 //get the pointer and camera coordinates in the moment of mouse click
 function cameraDrag()
@@ -353,8 +345,6 @@ function cameraDrag()
     else if (noteLayer.x+gridWidth*20<canvasWidth) {gridX=-gridWidth*20+canvasWidth; noteLayer.x=-gridWidth*20+canvasWidth;}
     else gridX=noteLayer.x;
     cursorX=game.input.x;
-    cursorY=game.input.y;
-    cameraY=game.camera.y;    
 }
 
 function render() {
