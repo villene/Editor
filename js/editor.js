@@ -11,13 +11,16 @@ var cameraX=0;
 var gridX=0;
 var label;
 var lastNote;
+var activeNote;
 var noteLayer;
 var textLayer;
 var lyricLabelLayer;
 var t=[];
+var cursors;
+
 
 function preload() {
-        game.load.spritesheet('stance', 'assets/note-state.png', 20, 20, 2);
+        game.load.spritesheet('stance', 'assets/note-state.png', 20, 20, 3);
         game.load.image('labels', 'assets/note-labels.png');
         game.load.image('text', 'assets/text.png');
         game.load.image('lyrtxt', 'assets/Lyric_label.png');
@@ -26,6 +29,7 @@ function preload() {
 function create() {
         game.world.setBounds(0, 0, 800, gridHeight*20+30); 
         this.game.canvas.id = 'editor';
+        cursors = game.input.keyboard.createCursorKeys();
         //create layers for buttons and labels 
         noteLayer = game.add.group();
         noteLayer.z=0;
@@ -51,7 +55,7 @@ function create() {
             note[j]=[];
             for (var i = 0; i < gridWidth; i++)
             {
-                note[j][i] = game.add.button(60+i*20, j*20, 'stance', fillNote, note[j][i], 1,0,1);
+                note[j][i] = game.add.button(60+i*20, j*20, 'stance', fillNote, note[j][i], 1,0,1,0);
                 note[j][i].hgt=j;
                 note[j][i].wdt=i;
                 note[j][i].on=false;
@@ -96,7 +100,7 @@ function fillNote()
         if (this.on){
             xmlNotes.splice(x,1);
             this.on = false;
-            this.setFrames(1,0, 1);
+            this.setFrames(1,0,1,0);
             this.frame = 0;
             lastNote=undefined;
             t[x].setText('');
@@ -119,7 +123,7 @@ function fillNote()
                     if(i===y)continue;
                     if (note[i][x].on){
                         note[i][x].on=false;
-                        note[i][x].setFrames(1, (note[i][x].on)?1:0, 1);
+                        note[i][x].setFrames(1, (note[i][x].on)?1:0, 1, 0);
                         note[i][x].frame = (note[i][x].on)?1:0;
                         document.getElementById('lyrics').value = xmlNotes[x].lyrics;
                         break;}
@@ -148,8 +152,10 @@ function fillNote()
             console.log(xmlNotes[x]);
             lastNote=x;            
             this.on = true;
-            this.setFrames(1, 1, 1);
+            this.setFrames(1, 1, 1, 0);
             this.frame = 1;
+            
+            activeNote={x:x, y:y};
             
             //shows text input box on click
             document.getElementById('lyrics').style.visibility = "visible";
@@ -158,7 +164,10 @@ function fillNote()
             document.getElementById('lyrics').focus();
         }
     }
-    else return;        
+    else {
+        this.frame=0;
+        return;
+    }        
 }
 
 function generateXML()
@@ -239,6 +248,7 @@ function resetGrid()
     for(var i=0; i<t.length; i++)
         t[i].setText('');
     lastNote = undefined;
+    activeNote = undefined;
     xmlNotes.splice(0, xmlNotes.length);
     document.getElementById('lyrics').style.visibility = "hidden";
     }
@@ -313,6 +323,11 @@ function loadFile(fileName){
 }}
 
 function update() {
+    cursors.up.onDown.add(moveUp, this);
+    cursors.down.onDown.add(moveDown, this);
+    cursors.left.onDown.add(moveLeft, this);
+    cursors.right.onDown.add(moveRight, this);
+    
     if (game.input.mousePointer.isDown)
         {
             game.input.onDown.add(cameraDrag, this);               
@@ -345,6 +360,152 @@ function cameraDrag()
     else if (noteLayer.x+gridWidth*20<canvasWidth) {gridX=-gridWidth*20+canvasWidth; noteLayer.x=-gridWidth*20+canvasWidth;}
     else gridX=noteLayer.x;
     cursorX=game.input.x;
+}
+
+function moveUp(){
+    if (activeNote){
+        if(activeNote.y===0) return;
+        else {
+            note[activeNote.y][activeNote.x].on=false;
+            note[activeNote.y][activeNote.x].frame = 0;
+            activeNote.y--;
+            note[activeNote.y][activeNote.x].on=true;
+            //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
+            note[activeNote.y][activeNote.x].frame = 2;  
+        }
+    }
+    else {
+        activeNote={x:0, y:gridHeight/2};
+        note[activeNote.y][activeNote.x].on=true;
+        //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
+        note[activeNote.y][activeNote.x].frame = 2;       
+    }     
+}
+
+function moveDown(){
+    if (activeNote){
+        if(activeNote.y===gridHeight-1) return;
+        else {
+            note[activeNote.y][activeNote.x].on=false;
+            note[activeNote.y][activeNote.x].frame = 0;
+            activeNote.y++;
+            note[activeNote.y][activeNote.x].on=true;
+            //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
+            note[activeNote.y][activeNote.x].frame = 2;  
+        }
+    }
+    else {
+        activeNote={x:0, y:gridHeight/2};
+        note[activeNote.y][activeNote.x].on=true;
+        //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
+        note[activeNote.y][activeNote.x].frame = 2;       
+    }     
+}
+
+function moveLeft(){
+    if (activeNote){
+        if(activeNote.x===0) return;
+        else {
+            note[activeNote.y][xmlNotes.length].frame = 0;
+            activateNote(activeNote.x, activeNote.y);
+            activeNote.x--;
+            for (var i=0; i<gridHeight; i++){
+                if(note[i][activeNote.x].on){
+                    activeNote.y=i;
+                }
+            }
+            note[activeNote.y][activeNote.x].on=true;
+            //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
+            note[activeNote.y][activeNote.x].frame = 2;  
+        }
+    }
+    else {
+        activeNote={x:0, y:gridHeight/2};
+        note[activeNote.y][activeNote.x].on=true;
+        //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
+        note[activeNote.y][activeNote.x].frame = 2;       
+    }     
+}
+
+function moveRight(){
+     if (activeNote){
+        if(activeNote.x===gridWidth-1) return;
+        else {
+            activateNote(activeNote.x, activeNote.y);
+            activeNote.x++;
+            for (var i=0; i<gridHeight; i++){
+                if(note[i][activeNote.x].on){
+                    activeNote.y=i;
+                }
+            }
+            note[activeNote.y][activeNote.x].on=true;
+            //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
+            note[activeNote.y][activeNote.x].frame = 2;  
+        }
+    }
+    else {
+        activeNote={x:0, y:gridHeight/2};
+        note[activeNote.y][activeNote.x].on=true;
+        //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
+        note[activeNote.y][activeNote.x].frame = 2;       
+    }
+}
+
+function activateNote(x, y){
+    if(lastNote!==undefined)
+                {
+                    
+                    xmlNotes[lastNote].lyrics=document.getElementById('lyrics').value;
+                    t[lastNote].setText(document.getElementById('lyrics').value);                    
+                    document.getElementById('lyrics').value="";
+                    
+                }
+
+
+            for (var i = 0; i<gridHeight; i++)
+                {
+                    if(i===y)continue;
+                    if (note[i][x].on){
+                        note[i][x].on=false;
+                        note[i][x].setFrames(1, (note[i][x].on)?1:0, 1, 0);
+                        note[i][x].frame = (note[i][x].on)?1:0;
+                        document.getElementById('lyrics').value = xmlNotes[x].lyrics;
+                        break;}
+                }
+
+            var oct = Math.floor((gridHeight-y)/12)+2;
+            var step = (gridHeight-y)%12;            
+            var alt;
+                switch(step){
+                    case 1: {step='C';break;}
+                    case 2: {step='C'; alt=1; break;}
+                    case 3: {step='D';break;}
+                    case 4: {step='D'; alt=1; break;}
+                    case 5: {step='E';break;}
+                    case 6: {step='F';break;}
+                    case 7: {step='F'; alt=1; break;}
+                    case 8: {step='G';break;}
+                    case 9: {step='G'; alt=1; break;}
+                    case 10: {step='A';break;}
+                    case 11: {step='A'; alt=1; break;}
+                    case 0: {step='B'; oct--;break;}
+
+            }
+
+            xmlNotes[x]={step:step, octave:oct, alteration:alt, duration:2};
+            console.log(xmlNotes[x]);
+            lastNote=x;            
+            note[y][x].on = true;
+            note[y][x].setFrames(1, 1, 1, 0);
+            note[y][x].frame = 1;
+            
+            activeNote={x:x, y:y};
+            
+            //shows text input box on click
+            document.getElementById('lyrics').style.visibility = "visible";
+            document.getElementById('lyrics').style.left = x*20+47+gridX+"px";
+            document.getElementById('lyrics').style.top = (y+2)*20+"px";
+            document.getElementById('lyrics').focus();        
 }
 
 function render() {
