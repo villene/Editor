@@ -129,6 +129,9 @@ function fillNote()
                         break;}
                 }
 
+            if(xmlNotes[activeNote.x]) note[activeNote.y][activeNote.x].frame = 1;
+            else note[activeNote.y][activeNote.x].frame = 0;
+
             var oct = Math.floor((gridHeight-y)/12)+2;
             var step = (gridHeight-y)%12;            
             var alt;
@@ -407,7 +410,12 @@ function moveLeft(){
         if(activeNote.x===0) return;
         else {
             note[activeNote.y][xmlNotes.length].frame = 0;
-            activateNote(activeNote.x, activeNote.y);
+            //activateNote(activeNote.x, activeNote.y);
+            if(xmlNotes[activeNote.x]) note[activeNote.y][activeNote.x].frame = 1;
+            else {
+                note[activeNote.y][activeNote.x].on=false;
+                note[activeNote.y][activeNote.x].frame = 0;
+            }
             activeNote.x--;
             for (var i=0; i<gridHeight; i++){
                 if(note[i][activeNote.x].on){
