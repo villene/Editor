@@ -16,6 +16,7 @@ var textLayer;
 var lyricLabelLayer;
 var t=[];
 var cursors;
+var space;
 
 
 function preload() {
@@ -28,7 +29,11 @@ function preload() {
 function create() {
         game.world.setBounds(0, 0, 800, gridHeight*20+30); 
         this.game.canvas.id = 'editor';
+        
         cursors = game.input.keyboard.createCursorKeys();
+        space = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
+                
+        
         //create layers for buttons and labels 
         noteLayer = game.add.group();
         noteLayer.z=0;
@@ -127,9 +132,9 @@ function fillNote()
                         document.getElementById('lyrics').value = xmlNotes[x].lyrics;
                         break;}
                 }
-
+            if(activeNote){
             if(xmlNotes[activeNote.x]) note[activeNote.y][activeNote.x].frame = 1;
-            else note[activeNote.y][activeNote.x].frame = 0;
+            else note[activeNote.y][activeNote.x].frame = 0;}
 
             var oct = Math.floor((gridHeight-y)/12)+2;
             var step = (gridHeight-y)%12;            
@@ -330,6 +335,11 @@ function update() {
     cursors.down.onDown.add(moveDown, this);
     cursors.left.onDown.add(moveLeft, this);
     cursors.right.onDown.add(moveRight, this);
+     /*if (game.input.keyboard.justPressed(Phaser.Keyboard.SPACEBAR, 50))
+    {
+        addRest();
+    }*/
+    space.onDown.add(addRest, this);
     
     if (game.input.mousePointer.isDown)
         {
@@ -378,7 +388,37 @@ function cameraDrag()
     else gridX=noteLayer.x;
     cursorX=game.input.x;
 }
-
+function addRest(){
+    if (activeNote){
+        for(var i=xmlNotes.length; i>activeNote.x; i--){
+            xmlNotes[i]=xmlNotes[i-1];
+        }
+        xmlNotes[activeNote.x]=undefined;
+        note[activeNote.y][activeNote.x].on=false;
+        note[activeNote.y][activeNote.x].frame = 0;
+        document.getElementById('lyrics').style.visibility = "hidden";
+        lastNote=undefined;
+        
+            activeNote.x++;
+            if(activeNote.x!==xmlNotes.length){
+        note[activeNote.y][xmlNotes.length-1].on=true;
+        note[activeNote.y][xmlNotes.length-1].frame=1;}
+            for (var i=0; i<gridHeight; i++){
+                if(note[i][activeNote.x].on){
+                    activeNote.y=i;
+                }
+            }
+            note[activeNote.y][activeNote.x].on=true;
+            //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
+            note[activeNote.y][activeNote.x].frame = 2;
+    }
+    else {
+        activeNote={x:0, y:gridHeight/2};
+        note[activeNote.y][activeNote.x].on=true;
+        //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
+        note[activeNote.y][activeNote.x].frame = 2;       
+    }     
+}
 function moveUp(){
     if (activeNote){
         if(activeNote.y===0) return;
