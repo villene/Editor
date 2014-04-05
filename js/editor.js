@@ -7,7 +7,6 @@ var gridWidth = 200;
 var note=[];
 var xmlNotes=[];
 var cursorX=0;
-var cameraX=0;
 var gridX=0;
 var label;
 var lastNote;
@@ -319,6 +318,7 @@ function loadFile(fileName){
                     note[y][x].on = true;
                     note[y][x].setFrames(1, 1, 1);
                     note[y][x].frame = 1;
+                    if (x===0) activeNote={y:y, x:x};
                     
                     t[x].setText(xmlNotes[x].lyrics);
                 
@@ -354,6 +354,20 @@ function update() {
                     lastNote = undefined;
                 }
         }
+    if(activeNote){    
+    if (activeNote.x>gridWidth-(gridWidth-canvasWidth/20)-noteLayer.x/20-6){
+        noteLayer.x-=200;
+        gridX=noteLayer.x;
+        textLayer.x-=200;
+        document.getElementById('lyrics').style.left = activeNote.x*20+47+noteLayer.x+"px";
+    }
+    else if(activeNote.x<gridWidth-(gridWidth-canvasWidth/20)-noteLayer.x/20-30 && activeNote.x>10){
+        noteLayer.x+=200;
+        gridX=noteLayer.x;
+        textLayer.x+=200;
+    }
+    }
+        
     if(gridX!==noteLayer.x) document.getElementById('lyrics').style.visibility = "hidden";            
 }
 //get the pointer and camera coordinates in the moment of mouse click
@@ -409,13 +423,14 @@ function moveLeft(){
     if (activeNote){
         if(activeNote.x===0) return;
         else {
-            note[activeNote.y][xmlNotes.length].frame = 0;
-            //activateNote(activeNote.x, activeNote.y);
-            if(xmlNotes[activeNote.x]) note[activeNote.y][activeNote.x].frame = 1;
+            if(xmlNotes.length<gridWidth)note[activeNote.y][xmlNotes.length].frame = 0;
+            else if (xmlNotes.length===gridWidth) note[activeNote.y][xmlNotes.length-1].frame = 0;
+            activateNote(activeNote.x, activeNote.y);
+            /*if(xmlNotes[activeNote.x]) note[activeNote.y][activeNote.x].frame = 1;
             else {
                 note[activeNote.y][activeNote.x].on=false;
                 note[activeNote.y][activeNote.x].frame = 0;
-            }
+            }*/
             activeNote.x--;
             for (var i=0; i<gridHeight; i++){
                 if(note[i][activeNote.x].on){
@@ -511,7 +526,7 @@ function activateNote(x, y){
             
             //shows text input box on click
             document.getElementById('lyrics').style.visibility = "visible";
-            document.getElementById('lyrics').style.left = x*20+47+gridX+"px";
+            document.getElementById('lyrics').style.left = x*20+47+noteLayer.x+"px";
             document.getElementById('lyrics').style.top = (y+2)*20+"px";
             document.getElementById('lyrics').focus();        
 }
