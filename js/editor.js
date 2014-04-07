@@ -477,9 +477,16 @@ function moveLeft(){
     if (activeNote){
         if(activeNote.x===0) return;
         else {
+            if(cursors.left.ctrlKey){
+                if(xmlNotes[activeNote.x]) note[activeNote.y][activeNote.x].frame = 1;
+            else {
+                note[activeNote.y][activeNote.x].on=false;
+                note[activeNote.y][activeNote.x].frame = 0;}
+            }
+            else activateNote(activeNote.x, activeNote.y);
             if(xmlNotes.length<gridWidth)note[activeNote.y][xmlNotes.length].frame = 0;
             else if (xmlNotes.length===gridWidth) note[activeNote.y][xmlNotes.length-1].frame = 0;
-            activateNote(activeNote.x, activeNote.y);
+            
             /*if(xmlNotes[activeNote.x]) note[activeNote.y][activeNote.x].frame = 1;
             else {
                 note[activeNote.y][activeNote.x].on=false;
@@ -508,7 +515,13 @@ function moveRight(){
      if (activeNote){
         if(activeNote.x===gridWidth-1) return;
         else {
-            activateNote(activeNote.x, activeNote.y);
+            if(cursors.right.ctrlKey){
+                if(xmlNotes[activeNote.x]) note[activeNote.y][activeNote.x].frame = 1;
+            else {
+                note[activeNote.y][activeNote.x].on=false;
+                note[activeNote.y][activeNote.x].frame = 0;}
+            }
+            else activateNote(activeNote.x, activeNote.y);
             activeNote.x++;
             for (var i=0; i<gridHeight; i++){
                 if(note[i][activeNote.x].on){
