@@ -3,7 +3,7 @@ var game = new Phaser.Game(800, 750, Phaser.CANVAS, 'phaser-canvas', { preload: 
 var canvasHeight = 750;
 var canvasWidth = 800;
 var gridHeight = 36;
-var gridWidth = 200;
+var gridWidth = 300;
 var note=[];
 var xmlNotes=[];
 var cursorX=0;
@@ -99,7 +99,7 @@ function fillNote()
 {
     if (game.input.x>60 && game.input.y<canvasHeight-30 && gridX===noteLayer.x){
         var y=this.hgt;
-        var x=this.wdt;
+        var x=this.wdt;        
         
         if (this.on){
             xmlNotes.splice(x,1);
@@ -214,7 +214,7 @@ function generateXML()
             
             noteParent.appendChild(xmlDoc.createElement("duration")).textContent =  xmlNotes[i].duration;
             
-            if (xmlNotes[i].lyrics!=="" || xmlNotes[i].lyrics!==undefined){
+            if ((xmlNotes[i].lyrics!=="" || xmlNotes[i].lyrics!==undefined) && xmlNotes[i].lyrics){
                 var lyricParent = noteParent.appendChild(xmlDoc.createElement("lyric"));         
                 lyricParent.appendChild(xmlDoc.createElement("text")).textContent = xmlNotes[i].lyrics;               
             }
@@ -349,7 +349,20 @@ function update() {
                 noteLayer.x = gridX+game.input.x-cursorX;
                 textLayer.x = gridX+game.input.x-cursorX;   
                 
-            }               
+            }
+            
+            if(activeNote){
+            if(xmlNotes[activeNote.x]){
+                note[activeNote.y][activeNote.x].frame=1;
+                activeNote=undefined;
+            }
+            
+            else {
+                note[activeNote.y][activeNote.x].on=false;
+                note[activeNote.y][activeNote.x].frame=0;
+                activeNote=undefined;
+                }
+            }
         }
         
     //accepts text input and hides input box on ENTER
@@ -399,10 +412,11 @@ function addRest(){
         document.getElementById('lyrics').style.visibility = "hidden";
         lastNote=undefined;
         
-            activeNote.x++;
+        activeNote.x++;
             if(activeNote.x!==xmlNotes.length){
-        note[activeNote.y][xmlNotes.length-1].on=true;
-        note[activeNote.y][xmlNotes.length-1].frame=1;}
+                note[activeNote.y][xmlNotes.length-1].on=true;
+                note[activeNote.y][xmlNotes.length-1].frame=1;
+            }
             for (var i=0; i<gridHeight; i++){
                 if(note[i][activeNote.x].on){
                     activeNote.y=i;
