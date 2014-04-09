@@ -401,6 +401,17 @@ function addRest(){
     if (activeNote){
         for(var i=xmlNotes.length; i>activeNote.x; i--){
             xmlNotes[i]=xmlNotes[i-1];
+            t[i].setText(t[i-1].text);
+            for (var j=0; j<gridHeight; j++){
+                if(note[j][i-1].on){
+                    note[j][i].on=true;
+                    note[j][i].setFrames(1,1,1);
+                    note[j][i].frame=1;
+                    note[j][i-1].on=false;
+                    note[j][i-1].setFrames(1,0,1);
+                    note[j][i-1].frame=0;
+                }
+                }
         }
         xmlNotes[activeNote.x]=undefined;
         note[activeNote.y][activeNote.x].on=false;
@@ -409,10 +420,10 @@ function addRest(){
         lastNote=undefined;
         
         activeNote.x++;
-            if(activeNote.x!==xmlNotes.length){
+            /*if(activeNote.x!==xmlNotes.length){
                 note[activeNote.y][xmlNotes.length-1].on=true;
                 note[activeNote.y][xmlNotes.length-1].frame=1;
-            }
+            }*/
             for (var i=0; i<gridHeight; i++){
                 if(note[i][activeNote.x].on){
                     activeNote.y=i;
@@ -438,7 +449,8 @@ function moveUp(){
             activeNote.y--;
             note[activeNote.y][activeNote.x].on=true;
             //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
-            note[activeNote.y][activeNote.x].frame = 2;  
+            note[activeNote.y][activeNote.x].frame = 2;
+            document.getElementById('lyrics').style.top = (activeNote.y+2)*20+"px";
         }
     }
     else {
@@ -446,7 +458,7 @@ function moveUp(){
         note[activeNote.y][activeNote.x].on=true;
         //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
         note[activeNote.y][activeNote.x].frame = 2;
-        activateNote(activeNote.x, activeNote.y)
+        activateNote(activeNote.x, activeNote.y);
     }     
 }
 
@@ -459,7 +471,8 @@ function moveDown(){
             activeNote.y++;
             note[activeNote.y][activeNote.x].on=true;
             //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
-            note[activeNote.y][activeNote.x].frame = 2;  
+            note[activeNote.y][activeNote.x].frame = 2;
+            document.getElementById('lyrics').style.top = (activeNote.y+2)*20+"px";
         }
     }
     else {
@@ -467,7 +480,7 @@ function moveDown(){
         note[activeNote.y][activeNote.x].on=true;
         //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
         note[activeNote.y][activeNote.x].frame = 2; 
-        activateNote(activeNote.x, activeNote.y)
+        activateNote(activeNote.x, activeNote.y);
     }     
 }
 
