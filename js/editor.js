@@ -335,10 +335,6 @@ function update() {
     cursors.down.onDown.add(moveDown, this);
     cursors.left.onDown.add(moveLeft, this);
     cursors.right.onDown.add(moveRight, this);
-     /*if (game.input.keyboard.justPressed(Phaser.Keyboard.SPACEBAR, 50))
-    {
-        addRest();
-    }*/
     space.onDown.add(addRest, this);
     
     if (game.input.mousePointer.isDown)
@@ -449,7 +445,8 @@ function moveUp(){
         activeNote={x:0, y:gridHeight/2};
         note[activeNote.y][activeNote.x].on=true;
         //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
-        note[activeNote.y][activeNote.x].frame = 2;       
+        note[activeNote.y][activeNote.x].frame = 2;
+        activateNote(activeNote.x, activeNote.y)
     }     
 }
 
@@ -469,7 +466,8 @@ function moveDown(){
         activeNote={x:0, y:gridHeight/2};
         note[activeNote.y][activeNote.x].on=true;
         //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
-        note[activeNote.y][activeNote.x].frame = 2;       
+        note[activeNote.y][activeNote.x].frame = 2; 
+        activateNote(activeNote.x, activeNote.y)
     }     
 }
 
@@ -477,67 +475,64 @@ function moveLeft(){
     if (activeNote){
         if(activeNote.x===0) return;
         else {
+            activeNote.x--;
+            for (var i=0; i<gridHeight; i++){
+                if(note[i][activeNote.x].on){
+                    note[activeNote.y][activeNote.x+1].frame=1;
+                    activeNote.y=i;
+                }
+            }
+            note[activeNote.y][activeNote.x].on=true;
+            //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
+            note[activeNote.y][activeNote.x].frame = 2; 
             if(cursors.left.ctrlKey){
                 if(xmlNotes[activeNote.x]) note[activeNote.y][activeNote.x].frame = 1;
             else {
                 note[activeNote.y][activeNote.x].on=false;
                 note[activeNote.y][activeNote.x].frame = 0;}
             }
-            else activateNote(activeNote.x, activeNote.y);
-            if(xmlNotes.length<gridWidth)note[activeNote.y][xmlNotes.length].frame = 0;
-            else if (xmlNotes.length===gridWidth) note[activeNote.y][xmlNotes.length-1].frame = 0;
-            
-            /*if(xmlNotes[activeNote.x]) note[activeNote.y][activeNote.x].frame = 1;
-            else {
-                note[activeNote.y][activeNote.x].on=false;
-                note[activeNote.y][activeNote.x].frame = 0;
-            }*/
-            activeNote.x--;
-            for (var i=0; i<gridHeight; i++){
-                if(note[i][activeNote.x].on){
-                    activeNote.y=i;
-                }
-            }
-            note[activeNote.y][activeNote.x].on=true;
-            //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
-            note[activeNote.y][activeNote.x].frame = 2;  
+            else activateNote(activeNote.x, activeNote.y);                 
         }
     }
     else {
         activeNote={x:0, y:gridHeight/2};
         note[activeNote.y][activeNote.x].on=true;
         //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
-        note[activeNote.y][activeNote.x].frame = 2;       
-    }     
+        note[activeNote.y][activeNote.x].frame = 2;
+        activateNote(activeNote.x, activeNote.y);
+    }  
 }
 
 function moveRight(){
      if (activeNote){
         if(activeNote.x===gridWidth-1) return;
         else {
+            activeNote.x++;
+            for (var i=0; i<gridHeight; i++){
+                if(note[i][activeNote.x].on){
+                    note[activeNote.y][activeNote.x-1].frame=1;
+                    activeNote.y=i;
+                    
+                }
+            }
+            note[activeNote.y][activeNote.x].on=true;
+            //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
+            note[activeNote.y][activeNote.x].frame = 2; 
             if(cursors.right.ctrlKey){
                 if(xmlNotes[activeNote.x]) note[activeNote.y][activeNote.x].frame = 1;
             else {
                 note[activeNote.y][activeNote.x].on=false;
                 note[activeNote.y][activeNote.x].frame = 0;}
             }
-            else activateNote(activeNote.x, activeNote.y);
-            activeNote.x++;
-            for (var i=0; i<gridHeight; i++){
-                if(note[i][activeNote.x].on){
-                    activeNote.y=i;
-                }
-            }
-            note[activeNote.y][activeNote.x].on=true;
-            //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
-            note[activeNote.y][activeNote.x].frame = 2;  
+            else activateNote(activeNote.x, activeNote.y);                 
         }
     }
     else {
         activeNote={x:0, y:gridHeight/2};
         note[activeNote.y][activeNote.x].on=true;
         //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
-        note[activeNote.y][activeNote.x].frame = 2;       
+        note[activeNote.y][activeNote.x].frame = 2;
+        activateNote(activeNote.x, activeNote.y);
     }
 }
 
@@ -548,6 +543,8 @@ function activateNote(x, y){
                     xmlNotes[lastNote].lyrics=document.getElementById('lyrics').value;
                     t[lastNote].setText(document.getElementById('lyrics').value);                    
                     document.getElementById('lyrics').value="";
+                    note[y][x].setFrames(1, 1, 1);
+                    if (note[y][lastNote].frame!==0)  note[y][lastNote].frame=1;                 
                     
                 }
 
@@ -586,8 +583,8 @@ function activateNote(x, y){
             console.log(xmlNotes[x]);
             lastNote=x;            
             note[y][x].on = true;
-            note[y][x].setFrames(1, 1, 1, 0);
-            note[y][x].frame = 1;
+            //note[y][x].setFrames(1, 1, 1, 0);
+            note[y][x].frame = 2;
             
             activeNote={x:x, y:y};
             
