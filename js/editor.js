@@ -499,7 +499,9 @@ function moveLeft(){
             //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
             note[activeNote.y][activeNote.x].frame = 2; 
             if(cursors.left.ctrlKey){
-                if(xmlNotes[activeNote.x]) note[activeNote.y][activeNote.x].frame = 1;
+                document.getElementById('lyrics').style.visibility = "hidden";
+                note[activeNote.y][activeNote.x].frame = 2;
+                if(xmlNotes[activeNote.x+1]) note[activeNote.y][activeNote.x+1].frame = 1;
             else {
                 note[activeNote.y][activeNote.x].on=false;
                 note[activeNote.y][activeNote.x].frame = 0;}
@@ -532,7 +534,9 @@ function moveRight(){
             //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
             note[activeNote.y][activeNote.x].frame = 2; 
             if(cursors.right.ctrlKey){
-                if(xmlNotes[activeNote.x]) note[activeNote.y][activeNote.x].frame = 1;
+                document.getElementById('lyrics').style.visibility = "hidden";
+                note[activeNote.y][activeNote.x].frame = 2;
+                if(xmlNotes[activeNote.x-1]) note[activeNote.y][activeNote.x-1].frame = 1;
             else {
                 note[activeNote.y][activeNote.x].on=false;
                 note[activeNote.y][activeNote.x].frame = 0;}
