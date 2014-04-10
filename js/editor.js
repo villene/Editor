@@ -564,6 +564,11 @@ function activateNote(x, y){
                     if (note[y][lastNote].frame!==0)  note[y][lastNote].frame=1;                 
                     
                 }
+                
+    if(t[x].text)
+        {
+            document.getElementById('lyrics').value=t[x].text;
+        }
 
 
             for (var i = 0; i<gridHeight; i++)
