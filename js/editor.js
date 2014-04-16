@@ -214,7 +214,7 @@ function generateXML()
             
             noteParent.appendChild(xmlDoc.createElement("duration")).textContent =  xmlNotes[i].duration;
             
-            if ((xmlNotes[i].lyrics!=="" || xmlNotes[i].lyrics!==undefined) && xmlNotes[i].lyrics){
+            if (xmlNotes[i].lyrics!==" " && xmlNotes[i].lyrics){
                 var lyricParent = noteParent.appendChild(xmlDoc.createElement("lyric"));         
                 lyricParent.appendChild(xmlDoc.createElement("text")).textContent = xmlNotes[i].lyrics;               
             }
@@ -293,7 +293,7 @@ function loadFile(fileName){
                 if(notes[i].getElementsByTagName("duration")[0]){
                      duration = notes[i].getElementsByTagName("duration")[0].childNodes[0].nodeValue;
                 }
-                if(notes[i].getElementsByTagName("text")[0]){
+                if(notes[i].getElementsByTagName("text")[0] && notes[i].getElementsByTagName("text")[0].childNodes[0]){
                      lyrics = notes[i].getElementsByTagName("text")[0].childNodes[0].nodeValue;
                 }
                 else lyrics="";
@@ -559,7 +559,7 @@ function activateNote(x, y){
                     
                     xmlNotes[lastNote].lyrics=document.getElementById('lyrics').value;
                     t[lastNote].setText(document.getElementById('lyrics').value);                    
-                    document.getElementById('lyrics').value="";
+                    document.getElementById('lyrics').value=undefined;
                     note[y][x].setFrames(1, 1, 1);
                     if (note[y][lastNote].frame!==0)  note[y][lastNote].frame=1;                 
                     
