@@ -450,7 +450,8 @@ function moveUp(){
             note[activeNote.y][activeNote.x].on=true;
             //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
             note[activeNote.y][activeNote.x].frame = 2;
-            document.getElementById('lyrics').style.top = (activeNote.y+2)*20+"px";
+            activateNote(activeNote.x, activeNote.y);
+            //document.getElementById('lyrics').style.top = (activeNote.y+2)*20+"px";
         }
     }
     else {
@@ -472,7 +473,8 @@ function moveDown(){
             note[activeNote.y][activeNote.x].on=true;
             //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
             note[activeNote.y][activeNote.x].frame = 2;
-            document.getElementById('lyrics').style.top = (activeNote.y+2)*20+"px";
+            activateNote(activeNote.x, activeNote.y);
+            //document.getElementById('lyrics').style.top = (activeNote.y+2)*20+"px";
         }
     }
     else {
@@ -491,21 +493,22 @@ function moveLeft(){
             activeNote.x--;
             for (var i=0; i<gridHeight; i++){
                 if(note[i][activeNote.x].on){
-                    note[activeNote.y][activeNote.x+1].frame=1;
                     activeNote.y=i;
+                    if(note[i][activeNote.x+1].on)note[activeNote.y][activeNote.x+1].frame=1;
+                    
                 }
             }
-            note[activeNote.y][activeNote.x].on=true;
+            //note[activeNote.y][activeNote.x].on=true;
             //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
             note[activeNote.y][activeNote.x].frame = 2; 
             if(cursors.left.ctrlKey){
                 document.getElementById('lyrics').style.visibility = "hidden";
-                note[activeNote.y][activeNote.x].frame = 2;
-                if(xmlNotes[activeNote.x+1]) note[activeNote.y][activeNote.x+1].frame = 1;
+                note[activeNote.y][activeNote.x].frame = 2;}
+                /*if(xmlNotes[activeNote.x+1]) note[activeNote.y][activeNote.x+1].frame = 1;
             else {
                 note[activeNote.y][activeNote.x].on=false;
                 note[activeNote.y][activeNote.x].frame = 0;}
-            }
+            }*/
             else activateNote(activeNote.x, activeNote.y);                 
         }
     }
@@ -535,12 +538,12 @@ function moveRight(){
             note[activeNote.y][activeNote.x].frame = 2; 
             if(cursors.right.ctrlKey){
                 document.getElementById('lyrics').style.visibility = "hidden";
-                note[activeNote.y][activeNote.x].frame = 2;
-                if(xmlNotes[activeNote.x-1]) note[activeNote.y][activeNote.x-1].frame = 1;
+                note[activeNote.y][activeNote.x].frame = 2;}
+                /*if(xmlNotes[activeNote.x-1]) note[activeNote.y][activeNote.x-1].frame = 1;
             else {
                 note[activeNote.y][activeNote.x].on=false;
                 note[activeNote.y][activeNote.x].frame = 0;}
-            }
+            }*/
             else activateNote(activeNote.x, activeNote.y);                 
         }
     }
@@ -549,7 +552,7 @@ function moveRight(){
         note[activeNote.y][activeNote.x].on=true;
         //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
         note[activeNote.y][activeNote.x].frame = 2;
-        activateNote(activeNote.x, activeNote.y);
+       activateNote(activeNote.x, activeNote.y);
     }
 }
 
