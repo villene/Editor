@@ -155,7 +155,7 @@ function fillNote()
 
             }
 
-            xmlNotes[x]={step:step, octave:oct, alteration:alt, duration:2};
+            xmlNotes[x]={step:step, octave:oct, alteration:alt, duration:2, y:y};
             console.log(xmlNotes[x]);
             lastNote=x;            
             this.on = true;
@@ -490,20 +490,28 @@ function moveLeft(){
     if (activeNote){
         if(activeNote.x===0) return;
         else {
+            
+            if(xmlNotes[activeNote.x])
+                note[xmlNotes[activeNote.x].y][activeNote.x].frame=1;
+            else note[activeNote.y][activeNote.x].frame=0;
+            
             activeNote.x--;
             for (var i=0; i<gridHeight; i++){
                 if(note[i][activeNote.x].on){
                     activeNote.y=i;
-                    if(note[i][activeNote.x+1].on)note[activeNote.y][activeNote.x+1].frame=1;
+                    //if(note[i][activeNote.x+1].on)note[activeNote.y][activeNote.x+1].frame=1;
                     
                 }
             }
             //note[activeNote.y][activeNote.x].on=true;
             //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
-            note[activeNote.y][activeNote.x].frame = 2; 
+            note[activeNote.y][activeNote.x].on=true;
+            note[activeNote.y][activeNote.x].frame = 2;
+          
             if(cursors.left.ctrlKey){
                 document.getElementById('lyrics').style.visibility = "hidden";
-                note[activeNote.y][activeNote.x].frame = 2;}
+                //note[activeNote.y][activeNote.x].frame = 2;
+            }
                 /*if(xmlNotes[activeNote.x+1]) note[activeNote.y][activeNote.x+1].frame = 1;
             else {
                 note[activeNote.y][activeNote.x].on=false;
@@ -525,26 +533,39 @@ function moveRight(){
      if (activeNote){
         if(activeNote.x===gridWidth-1) return;
         else {
+            
+            if(xmlNotes[activeNote.x])
+                note[xmlNotes[activeNote.x].y][activeNote.x].frame=1;
+            else note[activeNote.y][activeNote.x].frame=0;
+            
             activeNote.x++;
             for (var i=0; i<gridHeight; i++){
                 if(note[i][activeNote.x].on){
-                    note[activeNote.y][activeNote.x-1].frame=1;
+                    //note[activeNote.y][activeNote.x-1].frame=1;
                     activeNote.y=i;
                     
                 }
             }
-            note[activeNote.y][activeNote.x].on=true;
+            
             //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
-            note[activeNote.y][activeNote.x].frame = 2; 
+            
+            
             if(cursors.right.ctrlKey){
-                document.getElementById('lyrics').style.visibility = "hidden";
-                note[activeNote.y][activeNote.x].frame = 2;}
+                if (activeNote.x>=xmlNotes.length) activeNote.x--; 
+
+                else document.getElementById('lyrics').style.visibility = "hidden";
+                //note[activeNote.y][activeNote.x].frame = 2;
+            }
+            
                 /*if(xmlNotes[activeNote.x-1]) note[activeNote.y][activeNote.x-1].frame = 1;
             else {
                 note[activeNote.y][activeNote.x].on=false;
                 note[activeNote.y][activeNote.x].frame = 0;}
             }*/
-            else activateNote(activeNote.x, activeNote.y);                 
+            else activateNote(activeNote.x, activeNote.y); 
+            
+            note[activeNote.y][activeNote.x].on=true;
+            note[activeNote.y][activeNote.x].frame = 2;
         }
     }
     else {
@@ -604,7 +625,7 @@ function activateNote(x, y){
 
             }
 
-            xmlNotes[x]={step:step, octave:oct, alteration:alt, duration:2};
+            xmlNotes[x]={step:step, octave:oct, alteration:alt, duration:2, y:y};
             console.log(xmlNotes[x]);
             lastNote=x;            
             note[y][x].on = true;
