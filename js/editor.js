@@ -326,8 +326,9 @@ function loadFile(fileName){
                     if (x===0) activeNote={y:y, x:x};
                     
                     t[x].setText(xmlNotes[x].lyrics);
-                
+                    xmlNotes[x].y=y;
             }
+            note[activeNote.y][activeNote.x].frame=2;
 }}
 
 function update() {
