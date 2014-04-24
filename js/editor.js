@@ -399,7 +399,38 @@ function cameraDrag()
 }
 function addRest(){
     if (activeNote){
-        for(var i=xmlNotes.length; i>activeNote.x; i--){
+        
+        if(space.ctrlKey){
+            xmlNotes.splice(activeNote.x, 1);
+            for(var i=activeNote.x; i<=xmlNotes.length; i++)
+                {
+                    t[i].setText(t[i+1].text);
+                    for (var j=0; j<gridHeight; j++){
+                        if(note[j][i].on){
+                        note[j][i].on=false;
+                        note[j][i].setFrames(1,0,1);
+                        note[j][i].frame=0;
+                        }
+                    }
+                    if(xmlNotes[i]){
+                    note[xmlNotes[i].y][i].on=true;
+                    note[xmlNotes[i].y][i].setFrames(1,1,1);
+                    note[xmlNotes[i].y][i].frame=1;
+                    }
+                }
+                
+            for (var i=0; i<gridHeight; i++){
+                if(note[i][activeNote.x].on){
+                    activeNote.y=i;
+                }
+            }
+           note[activeNote.y][activeNote.x].frame=2;
+           document.getElementById('lyrics').style.visibility = "hidden";
+            lastNote=undefined;
+        }
+        
+        else {
+            for(var i=xmlNotes.length; i>activeNote.x; i--){
             xmlNotes[i]=xmlNotes[i-1];
             t[i].setText(t[i-1].text);
             for (var j=0; j<gridHeight; j++){
@@ -432,6 +463,7 @@ function addRest(){
             note[activeNote.y][activeNote.x].on=true;
             //note[activeNote.y][activeNote.x].setFrames(1, 2, 1);
             note[activeNote.y][activeNote.x].frame = 2;
+        }
     }
     else {
         activeNote={x:0, y:gridHeight/2};
