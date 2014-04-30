@@ -6,7 +6,7 @@ if ((($_FILES["file"]["type"] == "text/xml")
 || ($_FILES["file"]["type"] == "audio/midi")
 || ($_FILES["file"]["type"] == "audio/mid"))
 
-&& ($_FILES["file"]["size"] < 50000)
+&& ($_FILES["file"]["size"] < 100000)
 && in_array($extension, $allowedExts))
   {
   if ($_FILES["file"]["error"] > 0)
