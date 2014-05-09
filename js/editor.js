@@ -293,6 +293,13 @@ function loadFile(fileName){
             xmlhttp.send();
             var xmlDoc=xmlhttp.responseXML;
             
+            document.getElementById('sheetName').value=fileName.slice(0, -4);
+            
+            var loadTempo = xmlDoc.getElementsByTagName("sound");
+            if(loadTempo[0]){
+                document.getElementById('tempo').value = loadTempo[0].getAttribute('tempo');
+            }
+            
             var notes = xmlDoc.getElementsByTagName("note");
             for(var i= 0, l=notes.length; i<l; i++)
             {
