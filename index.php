@@ -50,6 +50,7 @@
 	</aside>
             <button id="reset" onclick="resetGrid();">Reset grid</button>            
             <input  type="text" id="sheetName" placeholder="XML name">
+            <p>Tempo:<input type="number" id="tempo" min="50" max="200"></p>
             <button id="XMLgen" onclick="generateXML();">Generate XML</button>
 	</header>
 	<div id="phaser-canvas">   

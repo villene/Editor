@@ -1,24 +1,29 @@
+//initializes phaser.js
 var game = new Phaser.Game(800, 750, Phaser.CANVAS, 'phaser-canvas', { preload: preload, create: create, update: update, render:render});
-
+//sets dimensions of canvas and the note sheet grid
 var canvasHeight = 750;
 var canvasWidth = 800;
 var gridHeight = 36;
 var gridWidth = 300;
-var note=[];
-var xmlNotes=[];
-var cursorX=0;
-var gridX=0;
+
+var note=[]; //variable for saving note information on the grid
+var xmlNotes=[]; //array for saving initialized notes that will be written in XML
+var cursorX=0; //mouse pointer X coordinate
+var gridX=0; //X coordinate for the current position of the grid
+
+//different variables for initializing sprites and Z layers for use in phaser.js
 var label;
 var lastNote;
 var activeNote;
 var noteLayer;
 var textLayer;
 var lyricLabelLayer;
-var t=[];
-var cursors;
-var space;
 
+var t=[];   //array for storing song lyrics
+var cursors;    //variable for default arrow keys in phaser.js
+var space;  //variable for storing the SPACEBAR button 
 
+//preloads assets
 function preload() {
         game.load.spritesheet('stance', 'assets/note-state.png', 20, 20, 3);
         game.load.image('labels', 'assets/note-labels.png');
@@ -26,48 +31,53 @@ function preload() {
         game.load.image('lyrtxt', 'assets/Lyric_label.png');
 }
 
+//creaates the whole phaser.js work environment
 function create() {
-        game.world.setBounds(0, 0, 800, gridHeight*20+30); 
-        this.game.canvas.id = 'editor';
+        game.world.setBounds(0, 0, 800, gridHeight*20+30); //creates canvas
+        this.game.canvas.id = 'editor'; //gives ID for canvas in HTML DOM
         
+        //initializes keyboard controls
         cursors = game.input.keyboard.createCursorKeys();
-        space = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);
-                
+        space = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);                
         
         //create layers for buttons and labels 
         noteLayer = game.add.group();
         noteLayer.z=0;
+        
         var labelLayer = game.add.group();
         labelLayer.z=1;
+        
         label = game.add.sprite(0,0, 'labels');        
         labelLayer.add(label);
+        
         lyricLabelLayer = game.add.group();
         lyricLabelLayer.z=1;
         var textSprite = game.add.sprite(0, canvasHeight-30,'text');
         lyricLabelLayer.add(textSprite);
         var LyricText = game.add.sprite(0, canvasHeight-30, 'lyrtxt');
         lyricLabelLayer.add(LyricText);
-        
-        
+                
         textLayer = game.add.group();        
         textLayer.z=2;
         
-        //set style for text
+        //set CSS styling for text
         var style = {font: "12px Arial", align: "center"};
-               
+        
+        //creates 2D array for storing the informtion on the grid
+        //each grid element is a button, which calls a funtion on-click
 	for (var j = 0; j<gridHeight; j++){                       
             note[j]=[];
             for (var i = 0; i < gridWidth; i++)
             {
                 note[j][i] = game.add.button(60+i*20, j*20, 'stance', fillNote, note[j][i], 1,0,1,0);
-                note[j][i].hgt=j;
-                note[j][i].wdt=i;
-                note[j][i].on=false;
-                noteLayer.add(note[j][i]);
+                note[j][i].hgt=j;   //height and width parameters of the button
+                note[j][i].wdt=i;   
+                note[j][i].on=false; //parameter, showing if button is initialized
+                noteLayer.add(note[j][i]); //adds button to the layer group
             }
 	}
         
-        
+        //adds horizontal text bar at the bottom and fills ir with empty values
         for (var i=0; i<gridWidth; i++)
             {
                 t[i] = game.add.text(61+i*20,canvasHeight-15,'', style);
@@ -75,7 +85,7 @@ function create() {
                 t[i].anchor.setTo(0,0.5);                
             }
             
-        //draw vertical lines
+        //draws vertical lines
         for(var i=1; i<=gridWidth/8; i++)
             {
                 var line = game.add.graphics(30+i*80, 0);
@@ -85,7 +95,8 @@ function create() {
                 line.lineTo(30+i*80, gridHeight*20);
                 line.endFill();
             }
-       //draw horizontal lines
+            
+       //draws horizontal lines
        for (var i=0; i<gridHeight; i+=12){
             var line = game.add.graphics(30, i*10);
             noteLayer.add(line);
@@ -95,6 +106,7 @@ function create() {
             line.endFill(); }
 }
 
+//function called when clicking a button on the grid
 function fillNote()
 {
     if (game.input.x>60 && game.input.y<canvasHeight-30 && gridX===noteLayer.x){
@@ -182,6 +194,7 @@ function generateXML()
     var xmlDoc;
     var xmlData;
     var xmlName = document.getElementById("sheetName").value;
+    var xmlTempo = document.getElementById("tempo").value;
     
     if(lastNote!==undefined){            
             xmlNotes[lastNote].lyrics=document.getElementById('lyrics').value;            
@@ -190,6 +203,13 @@ function generateXML()
         
     xmlDoc = document.implementation.createDocument(null, "score-partwise", null);
     xmlDoc.documentElement.appendChild(xmlDoc.createElement("movement-title")).textContent = xmlName;
+    
+    if(xmlTempo){
+    xmlDoc.documentElement.appendChild(xmlDoc.createElement("sound"));
+    var tempo=xmlDoc.getElementsByTagName('sound');
+    tempo[0].setAttribute("tempo", xmlTempo);
+    }
+    
     for (var i=0; i<xmlNotes.length; i++){
         
         var noteParent = xmlDoc.documentElement.appendChild(xmlDoc.createElement("note"));
