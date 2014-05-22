@@ -22,7 +22,8 @@ var lyricLabelLayer;
 
 var t=[];   //array for storing song lyrics
 var cursors;    //variable for default arrow keys in phaser.js
-var space;  //variable for storing the SPACEBAR button 
+var space;  //variable for storing the SPACEBAR button
+var del;
 
 //preloads assets
 function preload() {
@@ -39,8 +40,8 @@ function create() {
         
         //initializes keyboard controls
         cursors = game.input.keyboard.createCursorKeys();
-        space = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);                
-        
+        space = game.input.keyboard.addKey(Phaser.Keyboard.SPACEBAR);               
+        del = game.input.keyboard.addKey(Phaser.Keyboard.DELETE);
         //create layers for buttons and labels 
         noteLayer = game.add.group();
         noteLayer.z=0;
@@ -70,7 +71,7 @@ function create() {
             note[j]=[];
             for (var i = 0; i < gridWidth; i++)
             {
-                note[j][i] = game.add.button(60+i*20, j*20, 'stance', fillNote, note[j][i], 1,0,1,0);
+                note[j][i] = game.add.button(60+i*20, j*20, 'stance', activateNoteMouse, note[j][i], 1,0,1,0);
                 note[j][i].hgt=j;   //height and width parameters of the button
                 note[j][i].wdt=i;   
                 note[j][i].on=false; //parameter, showing if button is initialized
@@ -108,7 +109,7 @@ function create() {
 }
 
 //function called when clicking a button on the grid
-function fillNote()
+function activateNoteMouse()
 {   
     //checks, if clicked int the grid area and not on one of the labels
     if (game.input.x>60 && game.input.y<canvasHeight-30 && gridX===noteLayer.x){
@@ -204,7 +205,7 @@ function fillNote()
 }
 
 //function for marking notes when using keyboard
-function activateNote(x, y){
+function activateNoteKeyboard(x, y){
     //writes lyric in the previously activated note for seamless transition
     if(lastNote!==undefined)
                 {
@@ -340,6 +341,7 @@ function generateXML()
     {        
         xmlData = vkbeautify.xml(new XMLSerializer().serializeToString(xmlDoc));
         $.post("xmlgen.php", { data: xmlData });
+        alert ("File generated succesfully!");
     }
    else alert("Please specify a file name!");
 };
@@ -472,6 +474,7 @@ function update() {
     cursors.left.onDown.add(moveLeft, this);
     cursors.right.onDown.add(moveRight, this);
     space.onDown.add(addRest, this);
+    del.onDown.add(deleteNote, this);
     
     //if left mouse button is down, grid dragging can proceed
     if (game.input.mousePointer.isDown)
@@ -556,77 +559,81 @@ function cameraDrag()
 //function called when SPACEBAR is pressed. Adds an empty square, simulating 'pause' symbol
 function addRest(){
     //if activeNote is not undefined, i.e. keyboard is initialized
-    if (activeNote){
-        //if CTRL key is being held down, deletes currently highlighted note
-        if(space.ctrlKey)
+    if (activeNote){        
+        //moves all notes after the highlighted one one square forward
+        for(var i=xmlNotes.length; i>activeNote.x; i--)
             {
-                xmlNotes.splice(activeNote.x, 1);
-                //moves all notes after the deletd note back one square
-                for(var i=activeNote.x; i<=xmlNotes.length; i++)
+                xmlNotes[i]=xmlNotes[i-1];
+                t[i].setText(t[i-1].text);
+                for (var j=0; j<gridHeight; j++)
                     {
-                        t[i].setText(t[i+1].text);
-                        for (var j=0; j<gridHeight; j++)
+                        if(note[j][i-1].on)
                             {
-                                if(note[j][i].on)
-                                    {
-                                        note[j][i].on=false;
-                                        note[j][i].setFrames(1,0,1);
-                                        note[j][i].frame=0;
-                                    }
-                            }
-                        if(xmlNotes[i])
-                            {
-                                note[xmlNotes[i].y][i].on=true;
-                                note[xmlNotes[i].y][i].setFrames(1,1,1);
-                                note[xmlNotes[i].y][i].frame=1;
+                                note[j][i].on=true;
+                                note[j][i].setFrames(1,1,1);
+                                note[j][i].frame=1;
+                                note[j][i-1].on=false;
+                                note[j][i-1].setFrames(1,0,1);
+                                note[j][i-1].frame=0;
                             }
                     }
-
-                for (var i=0; i<gridHeight; i++)
-                    {
-                        if(note[i][activeNote.x].on)
-                            {
-                                activeNote.y=i;
-                            }
-                    }
-               note[activeNote.y][activeNote.x].frame=2;
-               document.getElementById('lyrics').style.visibility = "hidden";
-
-               lastNote=undefined;
             }
-        
-        //if CTRL is not being held
-        else 
-            {
-                //moves all notes after the highlighted one one square forward
-                for(var i=xmlNotes.length; i>activeNote.x; i--)
-                    {
-                        xmlNotes[i]=xmlNotes[i-1];
-                        t[i].setText(t[i-1].text);
-                        for (var j=0; j<gridHeight; j++)
-                            {
-                                if(note[j][i-1].on)
-                                    {
-                                        note[j][i].on=true;
-                                        note[j][i].setFrames(1,1,1);
-                                        note[j][i].frame=1;
-                                        note[j][i-1].on=false;
-                                        note[j][i-1].setFrames(1,0,1);
-                                        note[j][i-1].frame=0;
-                                    }
-                            }
-                    }
-            //marks the higlighted note as 'undefined', so that it is considered
-            //a 'rest' symbol upon XML generation
-            xmlNotes[activeNote.x]=undefined;
-            note[activeNote.y][activeNote.x].on=false;
-            note[activeNote.y][activeNote.x].frame = 0;
-            
-            document.getElementById('lyrics').style.visibility = "hidden";
-            lastNote=undefined;
+        //marks the higlighted note as 'undefined', so that it is considered
+        //a 'rest' symbol upon XML generation
+        xmlNotes[activeNote.x]=undefined;
+        note[activeNote.y][activeNote.x].on=false;
+        note[activeNote.y][activeNote.x].frame = 0;
 
-            //highlights the next initialized note
-            activeNote.x++;
+        document.getElementById('lyrics').style.visibility = "hidden";
+        lastNote=undefined;
+
+        //highlights the next initialized note
+        activeNote.x++;
+
+        for (var i=0; i<gridHeight; i++)
+            {
+                if(note[i][activeNote.x].on)
+                    {
+                        activeNote.y=i;
+                    }
+            }
+        note[activeNote.y][activeNote.x].on=true;
+        note[activeNote.y][activeNote.x].frame = 2;
+
+    }
+    //if keyboard is not initialized, activates the first square
+    else 
+    {
+        activeNote={x:0, y:gridHeight/2};
+        note[activeNote.y][activeNote.x].on=true;
+        note[activeNote.y][activeNote.x].frame = 2;       
+    }     
+}
+
+//called, when DELETE key is pressed
+function deleteNote(){
+    if (activeNote){                
+            xmlNotes.splice(activeNote.x, 1);
+            //moves all notes after the deleted note back one square
+            for(var i=activeNote.x; i<=xmlNotes.length; i++)
+                {
+                    t[i].setText(t[i+1].text);
+                    for (var j=0; j<gridHeight; j++)
+                        {
+                            if(note[j][i].on)
+                                {
+                                    note[j][i].on=false;
+                                    note[j][i].setFrames(1,0,1);
+                                    note[j][i].frame=0;
+                                }
+                        }
+                    if(xmlNotes[i])
+                        {
+                            note[xmlNotes[i].y][i].on=true;
+                            note[xmlNotes[i].y][i].setFrames(1,1,1);
+                            note[xmlNotes[i].y][i].frame=1;
+                        }
+                }
 
             for (var i=0; i<gridHeight; i++)
                 {
@@ -635,10 +642,12 @@ function addRest(){
                             activeNote.y=i;
                         }
                 }
-            note[activeNote.y][activeNote.x].on=true;
-            note[activeNote.y][activeNote.x].frame = 2;
-            }
-    }
+           note[activeNote.y][activeNote.x].frame=2;
+           document.getElementById('lyrics').style.visibility = "hidden";
+
+           lastNote=undefined;          
+    }   
+        
     //if keyboard is not initialized, activates the first square
     else 
     {
@@ -664,7 +673,7 @@ function moveUp(){
                     note[activeNote.y][activeNote.x].on=true;            
                     note[activeNote.y][activeNote.x].frame = 2;
                     //saves this note in xmlNotes
-                    activateNote(activeNote.x, activeNote.y);            
+                    activateNoteKeyboard(activeNote.x, activeNote.y);            
                 }
         }
     //if keyboard uninitialized, highlights the first square
@@ -673,7 +682,7 @@ function moveUp(){
             activeNote={x:0, y:gridHeight/2};
             note[activeNote.y][activeNote.x].on=true;
             note[activeNote.y][activeNote.x].frame = 2;
-            activateNote(activeNote.x, activeNote.y);
+            activateNoteKeyboard(activeNote.x, activeNote.y);
         }     
 }
 
@@ -689,7 +698,7 @@ function moveDown(){
                     activeNote.y++;
                     note[activeNote.y][activeNote.x].on=true;
                     note[activeNote.y][activeNote.x].frame = 2;
-                    activateNote(activeNote.x, activeNote.y);
+                    activateNoteKeyboard(activeNote.x, activeNote.y);
                 }
         }
     else 
@@ -697,7 +706,7 @@ function moveDown(){
             activeNote={x:0, y:gridHeight/2};
             note[activeNote.y][activeNote.x].on=true;
             note[activeNote.y][activeNote.x].frame = 2; 
-            activateNote(activeNote.x, activeNote.y);
+            activateNoteKeyboard(activeNote.x, activeNote.y);
         }     
 }
 
@@ -736,7 +745,7 @@ function moveLeft(){
                         {
                             document.getElementById('lyrics').style.visibility = "hidden";
                         }
-                    else activateNote(activeNote.x, activeNote.y);                 
+                    else activateNoteKeyboard(activeNote.x, activeNote.y);                 
                 }
         }
     //if keyboard uninitialized, marks the firstmost square of the grid
@@ -745,7 +754,7 @@ function moveLeft(){
             activeNote={x:0, y:gridHeight/2};
             note[activeNote.y][activeNote.x].on=true;
             note[activeNote.y][activeNote.x].frame = 2;
-            activateNote(activeNote.x, activeNote.y);
+            activateNoteKeyboard(activeNote.x, activeNote.y);
         }  
 }
 
@@ -776,7 +785,7 @@ function moveRight(){
                             if (activeNote.x>=xmlNotes.length) activeNote.x--;
                             else document.getElementById('lyrics').style.visibility = "hidden";
                         }
-                    else activateNote(activeNote.x, activeNote.y); 
+                    else activateNoteKeyboard(activeNote.x, activeNote.y); 
 
                     note[activeNote.y][activeNote.x].on=true;
                     note[activeNote.y][activeNote.x].frame = 2;
@@ -787,7 +796,7 @@ function moveRight(){
             activeNote={x:0, y:gridHeight/2};
             note[activeNote.y][activeNote.x].on=true;
             note[activeNote.y][activeNote.x].frame = 2;
-           activateNote(activeNote.x, activeNote.y);
+           activateNoteKeyboard(activeNote.x, activeNote.y);
         }
 }
 
