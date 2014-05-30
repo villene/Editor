@@ -278,72 +278,80 @@ function activateNoteKeyboard(x, y){
 //generates an XML structure from xmlNotes array
 function generateXML()
 {
-    var xmlDoc;
-    var xmlData;
-    var xmlName = document.getElementById("sheetName").value;
-    var xmlTempo = document.getElementById("tempo").value;
-    
-    //gets the last lyric value when generating XML
-    if(lastNote!==undefined)
-        {            
-            xmlNotes[lastNote].lyrics=document.getElementById('lyrics').value;            
-            document.getElementById('lyrics').value="";
-        }
-       
-        
-    xmlDoc = document.implementation.createDocument(null, "score-partwise", null);
-    xmlDoc.documentElement.appendChild(xmlDoc.createElement("movement-title")).textContent = xmlName;
-    
-    //if Tempo value exists, writes it in, otherwise ignores (tempo is optional)
-    if(xmlTempo)
+    if (xmlNotes.length===0) 
         {
-            xmlDoc.documentElement.appendChild(xmlDoc.createElement("sound"));
-            var tempo=xmlDoc.getElementsByTagName('sound');
-            tempo[0].setAttribute("tempo", xmlTempo);
+            alert ("Your sheet is blank!");
+            return;
         }
-    
-    //creates whole structure as defined if MusicXML documentation
-    for (var i=0; i<xmlNotes.length; i++)
-    {
-        
-        var noteParent = xmlDoc.documentElement.appendChild(xmlDoc.createElement("note"));
-        
-        //creates a rest element, if grid left unchecked
-        if (xmlNotes[i]===undefined)
-            {
-                noteParent.appendChild(xmlDoc.createElement("rest"));
-                noteParent.appendChild(xmlDoc.createElement("duration")).textContent = 2; 
-            }
-            
-        else{
-            var pitchParent = noteParent.appendChild(xmlDoc.createElement("pitch"));
-            pitchParent.appendChild(xmlDoc.createElement("step")).textContent = xmlNotes[i].step;
-                        
-            if (xmlNotes[i].alteration!==undefined)
-                {
-                    pitchParent.appendChild(xmlDoc.createElement("alter")).textContent = xmlNotes[i].alteration;                    
+    else
+        {
+            var xmlDoc;
+            var xmlData;
+            var xmlName = document.getElementById("sheetName").value;
+            var xmlTempo = document.getElementById("tempo").value;
+
+            //gets the last lyric value when generating XML
+            if(lastNote!==undefined)
+                {            
+                    xmlNotes[lastNote].lyrics=document.getElementById('lyrics').value;            
+                    document.getElementById('lyrics').value="";
                 }
-                
-            pitchParent.appendChild(xmlDoc.createElement("octave")).textContent = xmlNotes[i].octave;
-            
-            noteParent.appendChild(xmlDoc.createElement("duration")).textContent =  xmlNotes[i].duration;
-            
-            if (xmlNotes[i].lyrics!==" " && xmlNotes[i].lyrics){
-                var lyricParent = noteParent.appendChild(xmlDoc.createElement("lyric"));         
-                lyricParent.appendChild(xmlDoc.createElement("text")).textContent = xmlNotes[i].lyrics;               
+
+
+            xmlDoc = document.implementation.createDocument(null, "score-partwise", null);
+            xmlDoc.documentElement.appendChild(xmlDoc.createElement("movement-title")).textContent = xmlName;
+
+            //if Tempo value exists, writes it in, otherwise ignores (tempo is optional)
+            if(xmlTempo)
+                {
+                    xmlDoc.documentElement.appendChild(xmlDoc.createElement("sound"));
+                    var tempo=xmlDoc.getElementsByTagName('sound');
+                    tempo[0].setAttribute("tempo", xmlTempo);
+                }
+
+            //creates whole structure as defined if MusicXML documentation
+            for (var i=0; i<xmlNotes.length; i++)
+            {
+
+                var noteParent = xmlDoc.documentElement.appendChild(xmlDoc.createElement("note"));
+
+                //creates a rest element, if grid left unchecked
+                if (xmlNotes[i]===undefined)
+                    {
+                        noteParent.appendChild(xmlDoc.createElement("rest"));
+                        noteParent.appendChild(xmlDoc.createElement("duration")).textContent = 2; 
+                    }
+
+                else{
+                    var pitchParent = noteParent.appendChild(xmlDoc.createElement("pitch"));
+                    pitchParent.appendChild(xmlDoc.createElement("step")).textContent = xmlNotes[i].step;
+
+                    if (xmlNotes[i].alteration!==undefined)
+                        {
+                            pitchParent.appendChild(xmlDoc.createElement("alter")).textContent = xmlNotes[i].alteration;                    
+                        }
+
+                    pitchParent.appendChild(xmlDoc.createElement("octave")).textContent = xmlNotes[i].octave;
+
+                    noteParent.appendChild(xmlDoc.createElement("duration")).textContent =  xmlNotes[i].duration;
+
+                    if (xmlNotes[i].lyrics!==" " && xmlNotes[i].lyrics){
+                        var lyricParent = noteParent.appendChild(xmlDoc.createElement("lyric"));         
+                        lyricParent.appendChild(xmlDoc.createElement("text")).textContent = xmlNotes[i].lyrics;               
+                    }
+                }
+
             }
+
+            //calls XML serializer and POST only if the Name field is filled
+            if (xmlName!=="")
+            {        
+                xmlData = vkbeautify.xml(new XMLSerializer().serializeToString(xmlDoc));
+                $.post("xmlgen.php", { data: xmlData });
+                alert ("File generated succesfully!");
+            }    
+           else alert("Please specify a file name!");
         }
-        
-    }
-    
-    //calls XML serializer and POST only if the Name field is filled
-    if (xmlName!=="")
-    {        
-        xmlData = vkbeautify.xml(new XMLSerializer().serializeToString(xmlDoc));
-        $.post("xmlgen.php", { data: xmlData });
-        alert ("File generated succesfully!");
-    }
-   else alert("Please specify a file name!");
 };
 
 //function for clearing the whole grid
@@ -375,6 +383,13 @@ function resetGrid()
             activeNote = undefined;
             xmlNotes.splice(0, xmlNotes.length);
             document.getElementById('lyrics').style.visibility = "hidden";
+            document.getElementById('sheetName').value="";
+            document.getElementById('tempo').value="";
+            
+            //moves the grid to the far left
+            noteLayer.x=0;
+            gridX=0;
+            textLayer.x=0;
         }
 };
 

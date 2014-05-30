@@ -1,0 +1,36 @@
+#phaser-canvas{
+    overflow:visible;
+}
+
+body{
+    width: 1100px;
+    margin: 0 auto;
+}
+
+#lyrics{
+    position: relative;
+    width: 40px;
+    z-index: 1;
+    visibility: hidden;
+}
+
+#upload{  
+
+    float: right;
+    display: inline-block;
+    width: 290px;
+   
+}
+
+#editor{
+    border: solid black;
+}
+
+.file{
+    list-style: none;
+}
+
+#filelist{
+    height: 560px;
+    overflow: auto;
+}

@@ -1657,9 +1657,6 @@
             <octave>3</octave>
         </pitch>
         <duration>2</duration>
-        <lyric>
-            <text>undefined</text>
-        </lyric>
     </note>
     <note>
         <rest/>
